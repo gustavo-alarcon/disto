@@ -33,6 +33,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { StoreClosedDialogComponent } from './shared-dialogs/store-closed-dialog/store-closed-dialog.component';
+import { After19DialogComponent } from './shared-dialogs/after19-dialog/after19-dialog.component';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { StoreClosedDialogComponent } from './shared-dialogs/store-closed-dialog
     LoginComponent,
     UpdateDialogComponent,
     StoreClosedDialogComponent,
-    StoreClosedDialogComponent
+    StoreClosedDialogComponent,
+    After19DialogComponent
   ],
   imports: [
     BrowserModule,

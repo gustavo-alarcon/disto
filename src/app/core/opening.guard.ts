@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
-import { CanActivateChild, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
+import { CanActivateChild, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { DatabaseService } from './services/database.service';
-import { tap } from 'rxjs/internal/operators/tap';
-import { map, switchMap, take, shareReplay } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from './services/auth.service';
 import { StoreClosedDialogComponent } from '../shared-dialogs/store-closed-dialog/store-closed-dialog.component';
+import { After19DialogComponent } from '../shared-dialogs/after19-dialog/after19-dialog.component';
 
 @Injectable({
   providedIn: 'root'
@@ -25,10 +24,8 @@ export class OpeningGuard implements CanActivateChild {
   ];
 
   constructor(
-    private router: Router,
     private dbs: DatabaseService,
     private auth: AuthService,
-    private snackbar: MatSnackBar,
     private dialog: MatDialog
   ) { }
 
@@ -45,6 +42,7 @@ export class OpeningGuard implements CanActivateChild {
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return this.auth.user$.pipe(
       switchMap(user => {
+        
         return this.dbs.opening$.pipe(
           map(res => {
 
@@ -84,6 +82,13 @@ export class OpeningGuard implements CanActivateChild {
 
               if (time >= opening_time && time <= closing_time) {
                 isOpen = true;
+                // Checking if time is over 19:00 hours
+                if (hours >= 19 && this.dbs.messageSaw <= 2) {
+                  // Show purchase restriction in schedule
+                  console.log('Hola dev! Estas fuera del horario regular de compras!');
+                  this.dialog.open(After19DialogComponent);
+                  this.dbs.messageSaw++;
+                }
               } else {
                 if (time < opening_time) {
                   // this.snackbar.open(`😢 Lo sentimos cheese lover 💚, comenzaremos a tomar pedidos de ⌚ ${res[day - 1]['opening']} a ${res[day - 1]['closing']}`, 'Aceptar')

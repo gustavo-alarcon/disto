@@ -106,7 +106,7 @@ export class AuthService {
       lastLogin: new Date(),
       lastBrowser: [key.length ? key.join(", ") : "empty", navigator.userAgent]
     }
-    return userRef.set(data, { merge: true });
+    return userRef.update(data);
   }
 
   public logout(): void {
