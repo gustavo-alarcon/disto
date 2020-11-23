@@ -41,6 +41,8 @@ export class AuthService {
       this.afAuth.authState.pipe(
         switchMap(user => {
           if (user) {
+            console.log(user);
+            
             this.updateUserData(user);
             return this.afs.collection('users').doc<User>(user.uid)
               .valueChanges()
@@ -106,7 +108,8 @@ export class AuthService {
       lastLogin: new Date(),
       lastBrowser: [key.length ? key.join(", ") : "empty", navigator.userAgent]
     }
-    return userRef.update(data);
+
+    return userRef.set(data, {merge: true});
   }
 
   public logout(): void {
