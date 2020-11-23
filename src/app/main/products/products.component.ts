@@ -165,7 +165,7 @@ export class ProductsComponent implements OnInit {
 
   shoppingCart() {
     //aqui comprobamos stock
-    let check = this.checkStock();
+    //let check = this.checkStock();
     this.router.navigate(["/main/products/carrito"]);
   }
 
