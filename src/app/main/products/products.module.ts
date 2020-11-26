@@ -34,6 +34,7 @@ import { SaleDialogComponent } from './sale-dialog/sale-dialog.component';
 import { MatStepperModule } from '@angular/material/stepper';
 import { ChangeStockComponent } from './change-stock/change-stock.component';
 import { ShoppingCartViewComponent } from './shopping-cart-view/shopping-cart-view.component';
+import { SalesVideoComponent } from './sales-video/sales-video.component';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import { ShoppingCartViewComponent } from './shopping-cart-view/shopping-cart-vi
     RecipesComponent,
     SaleDialogComponent,
     ChangeStockComponent,
-    ShoppingCartViewComponent
+    ShoppingCartViewComponent,
+    SalesVideoComponent
   ],
   imports: [
     CommonModule,

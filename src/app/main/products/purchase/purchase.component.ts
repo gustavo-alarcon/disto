@@ -13,6 +13,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Component, OnInit, Input, ViewChild, ElementRef, Renderer2 } from '@angular/core';
 import { ScrollDispatcher } from '@angular/cdk/overlay';
 import { Router } from '@angular/router';
+import { SalesVideoComponent } from '../sales-video/sales-video.component';
 
 @Component({
   selector: 'app-purchase',
@@ -564,5 +565,8 @@ export class PurchaseComponent implements OnInit {
         this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
       });
     })
+  }
+  openVideo(): void {
+    this.dialog.open(SalesVideoComponent);
   }
 }

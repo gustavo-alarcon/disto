@@ -41,15 +41,17 @@ export class AuthService {
       this.afAuth.authState.pipe(
         switchMap(user => {
           if (user) {
-            console.log(user);
             
-            this.updateUserData(user);
             return this.afs.collection('users').doc<User>(user.uid)
-              .valueChanges()
-              // .pipe(
-              //   // map((res) => res.data())
-              //   map((res) => res)
-              // );
+              .valueChanges().pipe(
+                tap(res => {
+                  this.updateUserData(user);
+                })
+              )
+            // .pipe(
+            //   // map((res) => res.data())
+            //   map((res) => res)
+            // );
           } else {
             return of(null);
           }
@@ -70,7 +72,7 @@ export class AuthService {
     return this.afAuth.sendPasswordResetEmail(email)
   }
 
-  public signIn(type: 'facebook'|'google'): Promise<void | firebase.auth.UserCredential> {
+  public signIn(type: 'facebook' | 'google'): Promise<void | firebase.auth.UserCredential> {
     let provider = null;
 
     switch (type) {
@@ -109,7 +111,7 @@ export class AuthService {
       lastBrowser: [key.length ? key.join(", ") : "empty", navigator.userAgent]
     }
 
-    return userRef.set(data, {merge: true});
+    return userRef.set(data, { merge: true });
   }
 
   public logout(): void {
