@@ -42,7 +42,6 @@ export class OpeningGuard implements CanActivateChild {
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return this.auth.user$.pipe(
       switchMap(user => {
-        
         return this.dbs.opening$.pipe(
           map(res => {
 
