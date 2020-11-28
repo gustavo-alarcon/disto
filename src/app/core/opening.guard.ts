@@ -55,7 +55,7 @@ export class OpeningGuard implements CanActivateChild {
             } else {
               console.log('is not admin')
               this.dbs.isAdmin = false;
-              
+
               // Calculating the actual decimal time based in hours
               let now = new Date();
               let day = now.getDay();
@@ -88,6 +88,12 @@ export class OpeningGuard implements CanActivateChild {
                   this.dialog.open(After19DialogComponent);
                   this.dbs.messageSaw++;
                 }
+                
+                if (day >= 6) {
+                  this.dialog.open(After19DialogComponent);
+                  this.dbs.messageSaw++;
+                }
+
               } else {
                 if (time < opening_time) {
                   // this.snackbar.open(`😢 Lo sentimos cheese lover 💚, comenzaremos a tomar pedidos de ⌚ ${res[day - 1]['opening']} a ${res[day - 1]['closing']}`, 'Aceptar')
