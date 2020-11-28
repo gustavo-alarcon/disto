@@ -82,7 +82,7 @@ export class OpeningGuard implements CanActivateChild {
               if (time >= opening_time && time <= closing_time) {
                 isOpen = true;
                 // Checking if time is over 19:00 hours
-                if (hours >= 19 && this.dbs.messageSaw <= 2) {
+                if (hours >= 18 && minutes >= 45 && this.dbs.messageSaw <= 2) {
                   // Show purchase restriction in schedule
                   console.log('Hola dev! Estas fuera del horario regular de compras!');
                   this.dialog.open(After19DialogComponent);

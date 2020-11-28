@@ -1,6 +1,6 @@
 {
   "name": "disto-poductos",
-  "version": "1.1.58r",
+  "version": "1.1.59r",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
