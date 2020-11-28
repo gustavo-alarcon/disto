@@ -12,77 +12,36 @@
           <div class="formFieldRounded search-form">
             <mat-form-field appearance="outline" class="search-input">
               <mat-label>Buscar</mat-label>
-              <input
-                [formControl]="searchForm"
-                matInput
-                placeholder="Buscar Producto"
-                autocomplete="off"
-              />
-              <mat-icon
-                matPrefix
-                style="vertical-align: middle; margin-right: 5px"
-                >search</mat-icon
-              >
+              <input [formControl]="searchForm" matInput placeholder="Buscar Producto" autocomplete="off" />
+              <mat-icon matPrefix style="vertical-align: middle; margin-right: 5px">search</mat-icon>
             </mat-form-field>
           </div>
           <span class="ms-fill"></span>
-          <button
-            mat-raised-button
-            class="w3-hide-small buttonNoRounded"
-            color="accent"
-            style="height: 40px; padding: 0 20px"
-            (click)="dbs.total > 0 ? shoppingCart() : ''"
-          >
+          <button mat-raised-button class="w3-hide-small buttonNoRounded" color="accent"
+            style="height: 40px; padding: 0 20px" (click)="dbs.total > 0 ? shoppingCart() : ''">
             <span style="font-size: 1.5em">🛒</span>
             <span style="font-size: 1em" *ngIf="dbs.total > 0">
-              S/. {{ dbs.sum$ | async | number: ".2" }}</span
-            >
+              S/. {{ dbs.sum$ | async | number: ".2" }}</span>
           </button>
         </div>
-        <div
-          *ngIf="categoryList$ | async as categories"
-          class="w3-margin-bottom w3-hide-small"
-        >
-          <button
-            mat-stroked-button
-            *ngFor="let category of categories"
-            color="primary"
-            [ngClass]="category['select'] ? 'green category' : 'category'"
-            (click)="navigate(category['name'])"
-          >
+        <div *ngIf="categoryList$ | async as categories" class="w3-margin-bottom w3-hide-small">
+          <button mat-stroked-button *ngFor="let category of categories" color="primary"
+            [ngClass]="category['select'] ? 'green category' : 'category'" (click)="navigate(category['name'])">
             {{ category["name"] | titlecase }}
           </button>
         </div>
         <mat-divider class="w3-margin-bottom w3-hide-small"></mat-divider>
         <div *ngIf="products$ | async as products; else load">
-          <div
-            *ngIf="products.length > 0; else noResult"
-            class="ms-flex"
-            style="justify-content: space-evenly"
-          >
-            <app-product-div
-              [id]="product.id"
-              [buttonAdd]="true"
-              [maxWeight]="maxWeight"
-              [package]="product.package ? true : false"
-              *ngFor="
+          <div *ngIf="products.length > 0; else noResult" class="ms-flex" style="justify-content: space-evenly">
+            <app-product-div [id]="product.id" [buttonAdd]="true" [maxWeight]="maxWeight"
+              [package]="product.package ? true : false" *ngFor="
                 let product of products
                   | paginate: { itemsPerPage: 12, currentPage: p }
-              "
-              class="product-div"
-            >
+              " class="product-div">
             </app-product-div>
 
-            <div
-              style="display: flex; width: 100%; justify-content: flex-end"
-              *ngIf="products.length > 12"
-            >
-              <pagination-controls
-                (pageChange)="p = $event"
-                previousLabel=""
-                nextLabel=""
-                maxSize="6"
-              >
+            <div style="display: flex; width: 100%; justify-content: flex-end" *ngIf="products.length > 12">
+              <pagination-controls (pageChange)="p = $event" previousLabel="" nextLabel="" maxSize="6">
               </pagination-controls>
             </div>
           </div>
