@@ -2,8 +2,7 @@
     <div mat-dialog-title>
         <div class="ms-flex">
             <h2 class="title-login">
-                Hola, cheese lover. 🧀💚<br>
-                Necesitamos que te registres
+                Hola, cheese lover. 🧀💚
             </h2>
             <span class="ms-fill"></span>
             <button mat-icon-button mat-dialog-close>
@@ -14,64 +13,97 @@
 
     </div>
     <div mat-dialog-content>
-        <form [formGroup]="dataFormGroup">
-            <mat-form-field class="w3-block w3-small" appearance="outline">
-                <mat-label>Usuario</mat-label>
-                <input matInput type="email" autocapitalize="none"
-                    formControlName="email" placeholder="Correo electrónico" autocomplete="off">
-                <mat-error>
-                    <span *ngIf="dataFormGroup.get('email').errors?.required">Usuario requerido</span>
-                    <span *ngIf="dataFormGroup.get('email').errors?.email">Email no válido</span>
-                    <span *ngIf="dataFormGroup.get('email').errors?.googleLogin">
-                        Haga click en Ingresar con Google.</span>
-                        <span *ngIf="dataFormGroup.get('email').errors?.facebookLogin">
-                            Haga click en Ingresar con Facebook.</span>
-                </mat-error>
-            </mat-form-field>
+        <p class="info w3-center">Para continuar con tu compra, puedes elegir una de las siguientes opciones de ingreso.</p>
 
-            <mat-form-field class="w3-block w3-small" appearance="outline">
-                <mat-label>Contraseña</mat-label>
-                <input matInput [type]="hidePass ? 'password' : 'text'" 
-                    formControlName="pass" placeholder="***" autocapitalize="none"
-                    autocomplete="off">
-                <button mat-icon-button matSuffix (click)="hidePass = !hidePass"
-                    [attr.aria-label]="'Ocultar contraseña'" [attr.aria-pressed]="hidePass">
-                    <mat-icon>{{hidePass ? 'visibility_off' : 'visibility'}}</mat-icon>
-                </button>
-                <mat-error style="display: flex; flex-direction: row; justify-content: space-between;">
-                    <span *ngIf="dataFormGroup.get('pass').errors?.required">Contraseña requerido</span>
-                    <span *ngIf="dataFormGroup.get('pass').hasError('minlength')">Mínimo 6 caracteres</span>
-                    <span *ngIf="registerLogin$ | async" class="password" (click)="passwordReset()"> Olvidé mi contraseña</span>
-                </mat-error>
-                <mat-hint *ngIf="registerLogin$ | async" align="end">
-                    <span class="password" (click)="passwordReset()"> Olvidé mi contraseña</span>
-                </mat-hint>
-            </mat-form-field>
-        </form>
-
-        <button *ngIf="(registerLogin$ | async) else loginButton" mat-raised-button 
-            color="accent"
-            class="w3-block w3-margin-bottom w3-margin-top"
-            [disabled]="!dataFormGroup.valid" (click)="login()">
-            Ingresar
-        </button>
-        <ng-template #loginButton>
-            <button mat-raised-button 
-                color="basic"
-                class="w3-block w3-margin-bottom w3-margin-top"
-                [disabled]="!dataFormGroup.valid" (click)="registerUser()">
-                Registrarse
-            </button>
-        </ng-template>
 
         <div class="w3-margin-top">
+            <button mat-raised-button color="accent" class="w3-block w3-margin-bottom social social--register"
+                (click)="auth.signIn('google')">
+                <div class="ms-flex">
+                    <div class="w3-display-container w3-center social_icon">
+                        <img src="../../../assets/svg/mail-ios-disto.svg" alt="social icon">
+                    </div>
+                    
+                    <span class="ms-fill">Ingresar con <strong>Mail y Contraseña</strong></span>
+                </div>
+            </button>
+            <div style="display: none;">
+                <form [formGroup]="dataFormGroup">
+                    <mat-form-field class="w3-block w3-small" appearance="outline">
+                        <mat-label>Usuario</mat-label>
+                        <input matInput type="email" autocapitalize="none" formControlName="email"
+                            placeholder="Correo electrónico" autocomplete="off">
+                        <mat-error>
+                            <span *ngIf="dataFormGroup.get('email').errors?.required">Usuario requerido</span>
+                            <span *ngIf="dataFormGroup.get('email').errors?.email">Email no válido</span>
+                            <span *ngIf="dataFormGroup.get('email').errors?.googleLogin">
+                                Haga click en Ingresar con Google.</span>
+                            <span *ngIf="dataFormGroup.get('email').errors?.facebookLogin">
+                                Haga click en Ingresar con Facebook.</span>
+                        </mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field class="w3-block w3-small" appearance="outline">
+                        <mat-label>Contraseña</mat-label>
+                        <input matInput [type]="hidePass ? 'password' : 'text'" formControlName="pass" placeholder="***"
+                            autocapitalize="none" autocomplete="off">
+                        <button mat-icon-button matSuffix (click)="hidePass = !hidePass"
+                            [attr.aria-label]="'Ocultar contraseña'" [attr.aria-pressed]="hidePass">
+                            <mat-icon>{{hidePass ? 'visibility_off' : 'visibility'}}</mat-icon>
+                        </button>
+                        <mat-error style="display: flex; flex-direction: row; justify-content: space-between;">
+                            <span *ngIf="dataFormGroup.get('pass').errors?.required">Contraseña requerido</span>
+                            <span *ngIf="dataFormGroup.get('pass').hasError('minlength')">Mínimo 6 caracteres</span>
+                            <span *ngIf="registerLogin$ | async" class="password" (click)="passwordReset()"> Olvidé mi
+                                contraseña</span>
+                        </mat-error>
+                        <mat-hint *ngIf="registerLogin$ | async" align="end">
+                            <span class="password" (click)="passwordReset()"> Olvidé mi contraseña</span>
+                        </mat-hint>
+                    </mat-form-field>
+                </form>
+
+                <button *ngIf="(registerLogin$ | async) else loginButton" mat-raised-button color="accent"
+                    class="w3-block w3-margin-bottom w3-margin-top" [disabled]="!dataFormGroup.valid" (click)="login()">
+                    Ingresar
+                </button>
+                <ng-template #loginButton>
+                    <button mat-raised-button color="basic" class="w3-block w3-margin-bottom w3-margin-top"
+                        [disabled]="!dataFormGroup.valid" (click)="registerUser()">
+                        Registrarse
+                    </button>
+                </ng-template>
+            </div>
             <button mat-raised-button class="w3-block w3-margin-bottom social social--google"
                 (click)="auth.signIn('google')">
-                Ingresar con <strong>Google</strong>
+                <div class="ms-flex">
+                    <div class="w3-display-container w3-center social_icon">
+                        <img src="../../../assets/svg/gmail-icon-disto.svg" alt="google icon">
+                    </div>
+                    
+                    <span class="ms-fill">Ingresar con <strong>Google</strong></span>
+                </div>
+                
             </button>
             <button mat-raised-button class="w3-block w3-margin-bottom social social--facebook"
                 (click)="auth.signIn('facebook')">
-                Ingresar con <strong>Facebook</strong>
+                <div class="ms-flex">
+                    <div class="w3-display-container w3-center social_icon">
+                        <img src="../../../assets/svg/facebook-disto.svg" alt="facebook icon">
+                    </div>
+                    
+                    <span class="ms-fill">Ingresar con <strong>Facebook</strong></span>
+                </div>
+            </button>
+            <button mat-raised-button color="accent" class="w3-block w3-margin-bottom social social--express"
+                (click)="auth.signIn('google')">
+                <div class="ms-flex">
+                    <div class="w3-display-container w3-center social_icon">
+                        <img src="../../../assets/svg/cheese-disto.svg" alt="express icon">
+                    </div>
+                    
+                    <span class="ms-fill">Compra <strong>Express</strong></span>
+                </div>
             </button>
             <p *ngIf="auth$ | async"></p>
 

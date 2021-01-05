@@ -5,21 +5,40 @@
     width: 80%;
 }
 
-.social--register {
+.social--express {
     background: #fcd652;
+    color: #2b2b2b;
 }
 
 .social--google {
-    background: #5FA73A;
+    background: #ea4335;
     color: white;
 }
 
 .social--facebook {
-    background: #267034;
+    background: #4285f4;
     color: white;
 }
 
-.password{
+.social--register {
+    background: #2b2b2b;
+    color: white;
+}
+
+.social_icon {
+    filter: grayscale(1);
+}
+
+.password {
     cursor: pointer;
 }
 
+.info {
+    font-size: 12px;
+    font-weight: 400;
+    color: #2b2b2b;
+    margin-top: 0px;
+    border: 2px dashed #5da92f;
+    border-radius: 5px;
+    padding: 8px;
+}

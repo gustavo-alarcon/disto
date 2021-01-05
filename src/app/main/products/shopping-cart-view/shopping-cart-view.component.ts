@@ -5,6 +5,8 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { DatabaseService } from 'src/app/core/services/database.service';
 import { LoginDialogComponent } from '../../login-dialog/login-dialog.component';
+import { PurchaseTypeComponent } from '../../purchase-type/purchase-type.component';
+import { PurchaseComponent } from '../purchase/purchase.component';
 
 @Component({
   selector: 'app-shopping-cart-view',

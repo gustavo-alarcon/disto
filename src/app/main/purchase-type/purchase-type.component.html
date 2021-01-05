@@ -1,0 +1,34 @@
+<mat-dialog-content>
+    <div class="container">
+        <div class="express w3-center">
+            <p class="express_title">Compra <span class="express_title--black">EXPRESS</span></p>
+
+            <p>Al utilizar este método, no necesitas iniciar sesión con ninguna cuenta o correo, pero <strong><u>no
+                        podrémos
+                        guardar
+                        tus datos</u></strong> para una próxima compra.</p>
+
+            <p>¿Quieres continuar tu compra EXPRESS?</p>
+
+            <button mat-raised-button class="express_button w3-block" style="font-weight: bold"
+                routerLink="/main/products/compra" [disabled]="dbs.order.length == 0">
+                Si, quiero hacer una compra express
+            </button>
+        </div>
+
+        <div class="disto w3-center">
+            <p class="disto_title">Compra <span class="disto_title--black">DISTO</span></p>
+            <strong></strong>
+            <p>Al utilizar este método, necesitas iniciar sesión con tu cuenta de <strong>GMAIL</strong>,
+                <strong>FACEBOOK</strong> o <strong>CORREO PERSONAL</strong>. Así, ya
+                no tendrás que llenar tus datos en la próxima compra.</p>
+
+            <p>¿Quieres continuar tu compra DISTO?</p>
+
+            <button mat-raised-button class="disto_button w3-block" style="font-weight: bold"
+                routerLink="/main/products/compra" [disabled]="dbs.order.length == 0">
+                Si, quiero hacer una compra DISTO
+            </button>
+        </div>
+    </div>
+</mat-dialog-content>

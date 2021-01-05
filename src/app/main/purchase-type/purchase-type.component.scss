@@ -1,0 +1,71 @@
+::ng-deep .mat-dialog-container {
+    padding: 0px 0px;
+    overflow-x:hidden;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.express {
+    width: 350px;
+    background: #5EA931;
+    color: #ffffff;
+    padding: 1.5em 1.5em;
+    font-family: Poppins;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 21px;
+
+    &_title {
+        font-size: 34px;
+        line-height: 54px;
+        border-bottom: #ffffff solid 3px;
+        width: fit-content;
+        margin: auto;
+        margin-bottom: 14px;
+
+        &--black {
+            font-weight: 900;
+        }
+    }
+
+    &_button {
+        font-weight: 900;
+        background: #fdd651;
+        color: #2b2b2b !important;
+        margin-top: 14px;
+    }
+}
+
+.disto {
+    width: 350px;
+    background: #ffffff;
+    color: #2b2b2b;
+    padding: 1.5em 1.5em;
+    font-family: Poppins;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 21px;
+
+    &_title {
+        font-size: 34px;
+        line-height: 54px;
+        border-bottom: #2b2b2b solid 3px;
+        width: fit-content;
+        margin: auto;
+        margin-bottom: 14px;
+
+        &--black {
+            font-weight: 900;
+        }
+    }
+
+    &_button {
+        font-weight: 900;
+        background: #5EA931;
+        color: #ffffff !important;
+        margin-top: 14px;
+    }
+}
