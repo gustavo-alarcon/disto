@@ -26,6 +26,8 @@
             <div>
               <mat-horizontal-stepper linear #stepper class="ms-stepper">
                 <mat-step label="📝" [stepControl]="firstFormGroup" [completed]="firstFormGroup.valid">
+                  <button mat-raised-button color="primary" (click)="openVideo()">🙋🏻 Mira nuestro tutorial de compras
+                  </button>
                   <h2 class="subtitle">Datos personales</h2>
                   <form [formGroup]="firstFormGroup">
                     <mat-form-field class="w3-block" appearance="outline">
@@ -76,6 +78,8 @@
                   </div>
                 </mat-step>
                 <mat-step label="📦" [stepControl]="secondFormGroup" [completed]="secondFormGroup.valid">
+                  <button mat-raised-button color="primary" (click)="openVideo()">🙋🏻 Mira nuestro tutorial de compras
+                  </button>
                   <h2 class="subtitle">Datos de envío</h2>
                   <form [formGroup]="secondFormGroup">
                     <mat-form-field class="w3-block" appearance="outline">
@@ -144,6 +148,8 @@
                 </mat-step>
                 <mat-step label="💳">
                   <div *ngIf="!(loading$ | async)">
+                    <button mat-raised-button color="primary" (click)="openVideo()">🙋🏻 Mira nuestro tutorial de
+                      compras </button>
                     <h2 class="subtitle">Pago</h2>
                     <form [formGroup]="payFormGroup">
                       <div class="pay ms-flex">
@@ -228,9 +234,15 @@
                           </div>
                         </div>
 
-                        <div class="voucher" (click)="photoURL.click()">
-                          Agregar foto de voucher de pago
+                        <div style="display: flex; align-items: center">
+                          <div class="voucher" (click)="photoURL.click()">
+                            Agregar foto de voucher de pago
+                          </div>
+                          <button mat-icon-button (click)="openVideo()">
+                            <mat-icon>help_outline</mat-icon>
+                          </button>
                         </div>
+
                         <mat-hint>*Campo requerido</mat-hint>
 
                         <mat-progress-bar *ngIf="photos?.resizing$.photoURL | async" style="width: 100%"
@@ -250,7 +262,8 @@
                       <span class="ms-fill"></span>
                     </div>
                     <button mat-raised-button color="accent" type="submit" (click)="prueba()"
-                      class="w3-block w3-margin-top" style="font-weight: bold" [disabled]="dbs.order.length==0 || !payFormGroup.valid">
+                      class="w3-block w3-margin-top" style="font-weight: bold"
+                      [disabled]="dbs.order.length==0 || !payFormGroup.valid">
                       Finalizar Compra
                     </button>
                   </div>

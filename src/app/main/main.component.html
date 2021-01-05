@@ -54,13 +54,14 @@
                             <mat-icon class="menu__icon">account_circle</mat-icon>
                             Clientes
                         </button>
-                        <button mat-button class="w3-block menu__button" *ngIf="user?.admin || user?.seller || user?.logistic"
-                            routerLink="products-list" (click)="toggleSideMenu()">
+                        <button mat-button class="w3-block menu__button"
+                            *ngIf="user?.admin || user?.seller || user?.logistic" routerLink="products-list"
+                            (click)="toggleSideMenu()">
                             <mat-icon class="menu__icon">widgets</mat-icon>
                             Lista de Productos
                         </button>
-                        <button mat-button class="w3-block menu__button" *ngIf="user?.admin || user?.seller" routerLink="sales"
-                            (click)="toggleSideMenu()">
+                        <button mat-button class="w3-block menu__button" *ngIf="user?.admin || user?.seller"
+                            routerLink="sales" (click)="toggleSideMenu()">
                             <mat-icon class="menu__icon">assignment</mat-icon>
                             Ventas
                         </button>
@@ -117,15 +118,23 @@
 
         <mat-sidenav-content cdkScrollable>
             <mat-toolbar class="main__toolbar">
-                <div>
-                    <button mat-icon-button (click)="toggleSideMenu()">
-                        <mat-icon class="dark-icon">menu</mat-icon>
+
+                <button mat-icon-button (click)="toggleSideMenu()">
+                    <mat-icon class="dark-icon">menu</mat-icon>
+                </button>
+                <a class="w3-margin-left main__logo" routerLink="/main">
+                    <img src="../../assets/images/Disto_Logo.png" class="main__logoimage" alt="logo">
+                </a>
+                <span class="ms-fill"></span>
+                <a href="mailto:ventas@distoproductos.com?subject=Soporte%20Disto&body=💚 Hola cheese Lover ¿Cómo podemos ayudarte?" class="w3-margin-right">
+                    <button mat-raised-button color="accent" style="border: 2px solid green" class="w3-hide-small">
+                        <mat-icon>support_agent</mat-icon> Necesitas ayuda?
                     </button>
-                    <a class="w3-margin-left main__logo" routerLink="/main">
-                        <img src="../../assets/images/Disto_Logo.png" class="main__logoimage" alt="logo">
-                    </a>
-                </div>
-                <span style="flex: 1 1 auto;"></span>
+                    <button mat-raised-button color="accent" style="border: 2px solid green" class="w3-hide-large w3-hide-medium">
+                        <mat-icon>support_agent</mat-icon>
+                    </button>
+                </a>
+                <!-- <span style="flex: 1 1 auto;"></span> -->
             </mat-toolbar>
             <div class="main__space">
                 <router-outlet></router-outlet>

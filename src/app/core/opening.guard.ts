@@ -42,7 +42,6 @@ export class OpeningGuard implements CanActivateChild {
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return this.auth.user$.pipe(
       switchMap(user => {
-        
         return this.dbs.opening$.pipe(
           map(res => {
 
@@ -56,7 +55,7 @@ export class OpeningGuard implements CanActivateChild {
             } else {
               console.log('is not admin')
               this.dbs.isAdmin = false;
-              
+
               // Calculating the actual decimal time based in hours
               let now = new Date();
               let day = now.getDay();
@@ -83,12 +82,18 @@ export class OpeningGuard implements CanActivateChild {
               if (time >= opening_time && time <= closing_time) {
                 isOpen = true;
                 // Checking if time is over 19:00 hours
-                if (hours >= 19 && this.dbs.messageSaw <= 2) {
+                if (hours >= 18 && minutes >= 45 && this.dbs.messageSaw <= 2) {
                   // Show purchase restriction in schedule
                   console.log('Hola dev! Estas fuera del horario regular de compras!');
                   this.dialog.open(After19DialogComponent);
                   this.dbs.messageSaw++;
                 }
+                
+                if (day >= 6) {
+                  this.dialog.open(After19DialogComponent);
+                  this.dbs.messageSaw++;
+                }
+
               } else {
                 if (time < opening_time) {
                   // this.snackbar.open(`😢 Lo sentimos cheese lover 💚, comenzaremos a tomar pedidos de ⌚ ${res[day - 1]['opening']} a ${res[day - 1]['closing']}`, 'Aceptar')
