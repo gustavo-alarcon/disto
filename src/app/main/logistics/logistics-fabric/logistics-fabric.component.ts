@@ -196,11 +196,12 @@ export class LogisticsFabricComponent implements OnInit {
     }
   }
 
-  validated(product: BuyRequestedProduct, isedit: boolean, ind) {
+  validated(product: BuyRequestedProduct, isedit: boolean, ind, corr) {
     this.dialog.open(ValidatedDialogComponent, {
       data: {
         item: product,
-        edit: isedit
+        edit: isedit,
+        correlative: corr
       }
     }).afterClosed().pipe(
       take(1)
@@ -210,10 +211,11 @@ export class LogisticsFabricComponent implements OnInit {
   }
 
 
-  undoValidated(product: BuyRequestedProduct, ind) {
+  undoValidated(product: BuyRequestedProduct, ind, corr) {
     this.dialog.open(UndoDialogComponent, {
       data: {
-        item: product
+        item: product,
+        correlative: corr
       }
     }).afterClosed().pipe(
       take(1)

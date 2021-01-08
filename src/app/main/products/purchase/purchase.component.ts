@@ -410,17 +410,24 @@ export class PurchaseComponent implements OnInit {
 
         promises.push(transaction.get(sfDocRef).then((prodDoc) => {
 
-          let newStock = prodDoc.data().virtualStock - order.reduce;
-          transaction.update(sfDocRef, { virtualStock: newStock })
+          let newStock = prodDoc.data().realStock - order.reduce;
+          transaction.update(sfDocRef, { realStock: newStock })
+
           if (newStock >= prodDoc.data().sellMinimum) {
             return {
               isSave: true,
-              product: prodDoc.data().description
+              product: prodDoc.data().id,
+              wrongStock: false,
+              newStock: newStock,
+              oldStock: prodDoc.data().realStock
             }
           } else {
             return {
-              isSave: false,
-              product: prodDoc.data().description
+              isSave: true,
+              product: prodDoc.data().id,
+              wrongStock: true,
+              newStock: newStock,
+              oldStock: prodDoc.data().realStock
             }
           }
 
@@ -429,7 +436,10 @@ export class PurchaseComponent implements OnInit {
           console.log("Transaction failed: ", error);
           return {
             isSave: false,
-            product: null
+            product: order.product.id,
+            wrongStock: null,
+            newStock: order.product.realStock - order.reduce,
+            oldStock: order.product.realStock
           }
 
         }));
@@ -450,7 +460,43 @@ export class PurchaseComponent implements OnInit {
 
   }
 
+  saveStock(list, corr) {
+    const batch = this.af.firestore.batch()
+    list.forEach(lt => {
+      const editStock = this.af.firestore.collection(`db/distoProductos/productsList/${lt.product}/stockChange`).doc()
+      let changeVirtualStock = {
+        id: editStock.id,
+        description: 'Compra App, venta nº ' + corr,
+        createdAt: new Date(),
+        oldStock: lt.oldStock,
+        newStock: lt.newStock
+      }
+
+      batch.set(editStock, changeVirtualStock)
+    })
+
+    batch.commit().then(() => {
+      console.log('here');
+      this.dialog.open(SaleDialogComponent, {
+        data: {
+          name: this.firstFormGroup.value['name'],
+          number: corr,
+          email: this.user.email
+        }
+      })
+
+      this.dbs.order = []
+      this.dbs.orderObs.next([])
+      this.dbs.total = 0
+      this.router.navigate(["/main/products"], { fragment: this.dbs.productView });
+      //this.dbs.view.next(1)
+      this.loading.next(false)
+    })
+
+  }
+
   savePurchase(list) {
+
     const saleCount = this.af.firestore.collection(`/db/distoProductos/config/`).doc('generalConfig');
     const saleRef = this.af.firestore.collection(`/db/distoProductos/sales`).doc();
 
@@ -483,7 +529,8 @@ export class PurchaseComponent implements OnInit {
       deliveryPrice: this.dbs.delivery,
       voucher: [],
       voucherChecked: false,
-      transactionCliente: list
+      transactionCliente: list,
+      allSave: list.reduce((a, b) => a && b.isSave, true)
     }
 
     const email = {
@@ -496,7 +543,6 @@ export class PurchaseComponent implements OnInit {
 
     let userCorrelative = 1
     const ref = this.af.firestore.collection(`/users`).doc(this.user.uid);
-
 
     if (this.user.salesCount) {
       userCorrelative = this.user.salesCount + 1
@@ -530,7 +576,6 @@ export class PurchaseComponent implements OnInit {
           transaction.update(saleCount, { salesRCounter: newCorr });
 
           newSale.correlative = newCorr
-
           transaction.set(saleRef, newSale);
           //email
           transaction.set(emailRef, email)
@@ -547,20 +592,9 @@ export class PurchaseComponent implements OnInit {
         });
 
       }).then(() => {
-        this.dialog.open(SaleDialogComponent, {
-          data: {
-            name: this.firstFormGroup.value['name'],
-            number: newSale.correlative,
-            email: this.user.email
-          }
-        })
 
-        this.dbs.order = []
-        this.dbs.orderObs.next([])
-        this.dbs.total = 0
-        this.router.navigate(["/main/products"], { fragment: this.dbs.productView });
-        //this.dbs.view.next(1)
-        this.loading.next(false)
+        this.saveStock(list, newSale.correlative)
+
       }).catch(function (error) {
         this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
       });

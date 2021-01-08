@@ -29,7 +29,7 @@ export class ProductDivComponent implements OnInit {
   product$: Observable<any>;
   product: Product;
 
-  stock:number
+  stock: number
 
   productsList: Array<Product>;
   constructor(
@@ -37,37 +37,31 @@ export class ProductDivComponent implements OnInit {
     private router: Router,
     private snackBar: MatSnackBar,
     private dialog: MatDialog
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    
+
     if (this.package) {
       this.product$ = this.dbs.orderObs$.pipe(
-        switchMap(ord=>{
+        switchMap(ord => {
           return this.dbs.getPackage(this.id).pipe(
             switchMap((pack) => {
-             
+
               return this.dbs.getProductsListValueChanges().pipe(
                 map(items => {
-                  
+
                   pack["items"] = pack["items"].map((el) => {
                     let options = [...el.productsOptions].map((ul) => {
-                      let productOp = items
-                        .filter((lo) => lo.id == ul.id).map(lu=>{
-                
-                          return this.inOrder(lu,[...ord])
-                        })[0]
+                      let productOp = items.filter((lo) => lo.id == ul.id).map(lu => {
+                        return this.inOrder(lu, [...ord])
+                      })[0]
                       if (productOp) {
-                        ul["virtualStock"] = productOp["virtualStock"];
+                        ul["realStock"] = productOp["realStock"];
                         ul["sellMinimum"] = productOp["sellMinimum"];
                       }
                       return ul;
                     });
-    
-                    // let select = options.filter(lu => (lu.virtualStock >= lu.sellMinimum) && lu.published)[0]
-                    let select = options.filter(
-                      (lu) => lu?.virtualStock > lu?.sellMinimum
-                    )[0];
+                    let select = options.filter(lu => lu?.realStock > lu?.sellMinimum)[0];
                     return {
                       productsOptions: options,
                       choose: select,
@@ -80,33 +74,32 @@ export class ProductDivComponent implements OnInit {
           );
         }),
         tap((res) => {
-          
+
           this.product = res;
         })
       )
     } else {
       this.product$ = this.dbs.orderObs$.pipe(
-        switchMap(ord=>{
+        switchMap(ord => {
           return this.dbs.getProduct(this.id).pipe(
-            map(prod=>{
-             
-              return this.inOrder(prod,[...ord])
+            map(prod => {
+              return this.inOrder(prod, [...ord])
             })
           )
         }),
-        tap(prod=>{
+        tap(prod => {
           this.product = prod;
         })
       );
     }
   }
 
-  inOrder(res,ord) {
+  inOrder(res, ord) {
     let index = [...ord].findIndex(
       (el) => el["product"]["id"] == res["id"]
     );
     if (index != -1) {
-      res["virtualStock"] -= [...ord][index]["quantity"];
+      res["realStock"] -= [...ord][index]["quantity"];
     }
     let inPackage = [...ord].filter((li) => {
       if (li.product.package) {
@@ -116,13 +109,13 @@ export class ProductDivComponent implements OnInit {
       }
     });
     if (inPackage.length) {
-      res["virtualStock"]-= inPackage.length;
+      res["realStock"] -= inPackage.length;
     }
     return res;
   }
 
   add(item) {
-    
+
     if (!this.dbs.isOpen && !this.dbs.isAdmin) {
       this.dialog.open(StoreClosedDialogComponent);
       return;
@@ -136,9 +129,7 @@ export class ProductDivComponent implements OnInit {
       };
       this.dbs.order.push(newpackage);
     } else {
-      let index = this.dbs.order.findIndex(
-        (el) => el["product"]["id"] == item["id"]
-      );
+      let index = this.dbs.order.findIndex(el => el["product"]["id"] == item["id"]);
 
       if (index == -1) {
         let newproduct = {
@@ -161,7 +152,7 @@ export class ProductDivComponent implements OnInit {
         .reduce((a, b) => a + b, 0)
     );
     this.dbs.orderObs.next(this.dbs.order);
-    
+
     let stop = this.maxWeight;
     let realQuantity = this.dbs.order.map((el) => {
       if (el.product["package"]) {
@@ -178,13 +169,8 @@ export class ProductDivComponent implements OnInit {
     let quantity = realQuantity.reduce((a, b) => a + b, 0);
 
     if (quantity >= stop) {
-      this.snackBar.open(
-        "🤯 Ha llegado al límite máximo de peso por pedido 🧀",
-        "Aceptar",
-        {
-          duration: 6000,
-        }
-      );
+      this.snackBar.open("🤯 Ha llegado al límite máximo de peso por pedido 🧀",
+        "Aceptar", { duration: 6000 });
     }
   }
 
@@ -244,7 +230,7 @@ export class ProductDivComponent implements OnInit {
   }
 
   optionDisabled(product: Product): boolean {
-    let stock = product.virtualStock <= product.sellMinimum;
+    let stock = product.realStock <= product.sellMinimum;
     return stock;
   }
 

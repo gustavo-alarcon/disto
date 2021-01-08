@@ -28,7 +28,8 @@
                                             🛍️ {{sale['createdAt'].toMillis() | date: 'dd-MMM-yyyy' }}
                                         </div>
                                         <div *ngIf="sale.confirmedRequestData" matTooltip="Fecha Asignada">📦
-                                            {{sale.confirmedRequestData['assignedDate'].toMillis() | date: 'dd-MMM-yyyy' }}
+                                            {{sale.confirmedRequestData['assignedDate'].toMillis() | date: 'dd-MMM-yyyy'
+                                            }}
                                         </div>
                                     </div>
                                     <div style="width: 120px;">
@@ -78,7 +79,8 @@
                                         <div matTooltip="Fecha Solicitada">🛍️
                                             {{sale['createdAt'].toMillis() | date: 'dd-MMM-yyyy' }}</div>
                                         <div matTooltip="Fecha Asignada" *ngIf="sale.confirmedRequestData">📦
-                                            {{sale.confirmedRequestData['assignedDate'].toMillis() | date: 'dd-MMM-yyyy' }}
+                                            {{sale.confirmedRequestData['assignedDate'].toMillis() | date: 'dd-MMM-yyyy'
+                                            }}
                                         </div>
                                     </div>
                                 </div>
@@ -114,8 +116,8 @@
                     <h2 class="title2 w3-margin-left">Lista de compras
                         #{{chooseSale.correlativeType}}{{("000"+chooseSale.correlative).slice(-4)}} 🛒</h2>
                 </div>
-                <app-shopping-cart [delivery]="chooseSale.deliveryPrice" [change]="false" [order]="chooseSale.requestedProducts"
-                    [modified]="false"></app-shopping-cart>
+                <app-shopping-cart [delivery]="chooseSale.deliveryPrice" [change]="false"
+                    [order]="chooseSale.requestedProducts" [modified]="false"></app-shopping-cart>
 
             </div>
         </div>
