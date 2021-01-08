@@ -21,7 +21,7 @@ export class UndoDialogComponent implements OnInit {
     private dbs: DatabaseService,
     private snackBar: MatSnackBar,
     private af: AngularFirestore,
-    @Inject(MAT_DIALOG_DATA) public data: { item: BuyRequestedProduct, status: 'string' }) { }
+    @Inject(MAT_DIALOG_DATA) public data: { item: BuyRequestedProduct, status: 'string', correlative: number }) { }
 
   ngOnInit(): void {
   }
@@ -60,6 +60,7 @@ export class UndoDialogComponent implements OnInit {
     this.loading.next(true)
     const requestRef = this.af.firestore.collection(`/db/distoProductos/buys`).doc(this.data.item.buyId);
     const requestProductRef = this.af.firestore.collection(`/db/distoProductos/buys/${this.data.item.buyId}/buyRequestedProducts`).doc(this.data.item.id);
+    const editStockRef = this.af.firestore.collection(`db/distoProductos/productsList/${this.data.item.id}/stockChange`).doc()
 
     const ref = this.af.firestore.collection(`/db/distoProductos/productsList`).doc(this.data.item.id);
     const transferHistoryRef = this.af.firestore.collection(this.dbs.productsListRef + `/${this.data.item.id}/mermaTransfer`).doc();
@@ -67,13 +68,11 @@ export class UndoDialogComponent implements OnInit {
     this.af.firestore.runTransaction((transaction) => {
       return transaction.get(ref).then((prodDoc) => {
         let newStock = prodDoc.data().realStock - item.quantity
-        let newVirtualStock = prodDoc.data().virtualStock - item.quantity
         let newMerma = prodDoc.data().mermaStock - item.merma
 
         transaction.update(ref, {
           mermaStock: newMerma,
-          realStock: newStock,
-          virtualStock:newVirtualStock
+          realStock: newStock
         })
 
         if (item.merma != 0) {
@@ -112,6 +111,14 @@ export class UndoDialogComponent implements OnInit {
           returnedStatus: array.length == 0 ? 'por validar' : 'pendiente'
         })
 
+        transaction.set(editStockRef, {
+          id: editStockRef.id,
+          description: 'anulado en logistica, compra nº ' + this.data.correlative,
+          createdAt: new Date(),
+          oldStock: prodDoc.data().realStock,
+          newStock: newStock
+        })
+
       });
     }).then(() => {
       this.loading.next(false)
@@ -136,6 +143,7 @@ export class UndoDialogComponent implements OnInit {
     const requestRef = this.af.firestore.collection(`/db/distoProductos/buys`).doc(product.buyId);
     const requestProductRef = this.af.firestore.collection(`/db/distoProductos/buys/${product.buyId}/buyRequestedProducts`).doc(product.id);
     const productRef = this.af.firestore.collection(`/db/distoProductos/productsList`).doc(product.id);
+    const editStockRef = this.af.firestore.collection(`db/distoProductos/productsList/${product.id}/stockChange`).doc()
     let quantity = product.quantity - (product.validationData.mermaStock + product.validationData.returned)
     const transferHistoryRef = this.af.firestore.collection(this.dbs.productsListRef + `/${this.data.item.id}/mermaTransfer`).doc();
 
@@ -156,7 +164,7 @@ export class UndoDialogComponent implements OnInit {
           }
         })
 
-        let prodR = products.filter(el=>el.validationData).map(el=>{
+        let prodR = products.filter(el => el.validationData).map(el => {
           if (el.id == product.id) {
             el.returned = false
           }
@@ -177,7 +185,6 @@ export class UndoDialogComponent implements OnInit {
       this.af.firestore.runTransaction((transaction) => {
         return transaction.get(productRef).then((prodDoc) => {
           let newStock = prodDoc.data().realStock - quantity;
-          let newVirtualStock = prodDoc.data().virtualStock - quantity;
           let newMerma = prodDoc.data().mermaStock - product.validationData.mermaStock;
 
           if (product.validationData.mermaStock != 0) {
@@ -195,8 +202,7 @@ export class UndoDialogComponent implements OnInit {
 
           transaction.update(productRef, {
             realStock: newStock,
-            mermaStock: newMerma,
-            virtualStock:newVirtualStock
+            mermaStock: newMerma
           });
 
           transaction.update(requestRef, {
@@ -215,6 +221,14 @@ export class UndoDialogComponent implements OnInit {
             returned: false,
             returnedStatus: 'por validar',
             returnRecord: null
+          })
+
+          transaction.set(editStockRef, {
+            id: editStockRef.id,
+            description: 'anulado en logistica, compra nº ' + this.data.correlative,
+            createdAt: new Date(),
+            oldStock: prodDoc.data().realStock,
+            newStock: newStock
           })
 
         });

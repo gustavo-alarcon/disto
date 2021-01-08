@@ -22,7 +22,7 @@ export class UndoReturnDialogComponent implements OnInit {
     private dbs: DatabaseService,
     private snackBar: MatSnackBar,
     private af: AngularFirestore,
-    @Inject(MAT_DIALOG_DATA) public data: { item: BuyRequestedProduct, status: 'string' }) { }
+    @Inject(MAT_DIALOG_DATA) public data: { item: BuyRequestedProduct, status: 'string',correlative:number }) { }
 
   ngOnInit(): void {
   }
@@ -50,16 +50,16 @@ export class UndoReturnDialogComponent implements OnInit {
     const requestProductRef = this.af.firestore.collection(`/db/distoProductos/buys/${this.data.item.buyId}/buyRequestedProducts`).doc(this.data.item.id);
 
     const ref = this.af.firestore.collection(`/db/distoProductos/productsList`).doc(this.data.item.id);
+    const editStockRef = this.af.firestore.collection(`db/distoProductos/productsList/${this.data.item.id}/stockChange`).doc()
+    
     this.af.firestore.runTransaction((transaction) => {
       return transaction.get(ref).then((prodDoc) => {
         let newStock = prodDoc.data().realStock - item.quantity
-        let newVirtualStock = prodDoc.data().virtualStock - item.quantity
         let newMerma = prodDoc.data().mermaStock - item.merma
 
         transaction.update(ref, {
           mermaStock: newMerma,
-          realStock: newStock,
-          virtualStock:newVirtualStock
+          realStock: newStock
         })
 
         transaction.update(requestProductRef, {
@@ -82,6 +82,14 @@ export class UndoReturnDialogComponent implements OnInit {
           returnedDate: null,
           status: 'pendiente',
           returnedStatus: array.length == 0 ? 'por validar' : 'pendiente'
+        })
+
+        transaction.set(editStockRef, {
+          id: editStockRef.id,
+          description: 'desvalidar devolucion compra nº ' + this.data.correlative,
+          createdAt: new Date(),
+          oldStock: prodDoc.data().realStock,
+          newStock: newStock
         })
 
       });
@@ -108,6 +116,7 @@ export class UndoReturnDialogComponent implements OnInit {
     const requestRef = this.af.firestore.collection(`/db/distoProductos/buys`).doc(product.buyId);
     const requestProductRef = this.af.firestore.collection(`/db/distoProductos/buys/${product.buyId}/buyRequestedProducts`).doc(product.id);
     const productRef = this.af.firestore.collection(`/db/distoProductos/productsList`).doc(product.id);
+    const editStockRef = this.af.firestore.collection(`db/distoProductos/productsList/${product.id}/stockChange`).doc()
     let quantity = product.quantity - (product.validationData.mermaStock + product.validationData.returned)
 
     let returnAll$ = this.dbs.getBuyRequestedProducts(product.buyId).pipe(
@@ -138,13 +147,11 @@ export class UndoReturnDialogComponent implements OnInit {
       this.af.firestore.runTransaction((transaction) => {
         return transaction.get(productRef).then((prodDoc) => {
           let newStock = prodDoc.data().realStock - quantity;
-          let newVirtualStock = prodDoc.data().virtualStock - quantity;
           let newMerma = prodDoc.data().mermaStock - product.validationData.mermaStock;
 
           transaction.update(productRef, {
             realStock: newStock,
-            mermaStock: newMerma,
-            virtualStock:newVirtualStock
+            mermaStock: newMerma
           });
 
           transaction.update(requestRef, {
@@ -161,6 +168,14 @@ export class UndoReturnDialogComponent implements OnInit {
             validationData: null,
             returned: false,
             returnedStatus: 'por validar'
+          })
+
+          transaction.set(editStockRef, {
+            id: editStockRef.id,
+            description: 'devolucion compra nº ' + this.data.correlative,
+            createdAt: new Date(),
+            oldStock: prodDoc.data().realStock,
+            newStock: newStock
           })
 
         });

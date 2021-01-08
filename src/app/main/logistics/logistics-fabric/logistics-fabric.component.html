@@ -116,16 +116,17 @@
           <td mat-cell *matCellDef="let element; let i = index" class="ms-table__td w3-center">
 
             <button *ngIf="element['validatedStatus']=='por validar'" mat-raised-button color="accent"
-              class="buttonNoRounded" (click)="validated(element,false,ind)" style="width: 110px;">Validar</button>
+              class="buttonNoRounded" (click)="validated(element,false,ind,buy.correlative)"
+              style="width: 110px;">Validar</button>
 
 
             <div *ngIf="element['validatedStatus']=='validado'" class="ms-flex ms-flex--center"
               style="justify-content: center;">
 
-              <button (click)="validated(element,true,ind)" mat-raised-button color="primary" style="margin-right: 8px;"
-                class="buttonNoRounded">Correcto</button>
+              <button (click)="validated(element,true,ind,buy.correlative)" mat-raised-button color="primary"
+                style="margin-right: 8px;" class="buttonNoRounded">Correcto</button>
 
-              <button (click)="undoValidated(element,ind)" mat-icon-button matTooltip="Deshacer">
+              <button (click)="undoValidated(element,ind,buy.correlative)" mat-icon-button matTooltip="Deshacer">
                 <mat-icon>undo</mat-icon>
               </button>
             </div>
@@ -133,10 +134,10 @@
             <div *ngIf="element['validatedStatus']=='pendiente'" class="ms-flex ms-flex--center"
               style="justify-content: center;">
 
-              <button (click)="validated(element,true,ind)" mat-raised-button color="accent" style="margin-right: 8px;"
-                class="buttonNoRounded">Pendiente</button>
+              <button (click)="validated(element,true,ind,buy.correlative)" mat-raised-button color="accent"
+                style="margin-right: 8px;" class="buttonNoRounded">Pendiente</button>
 
-              <button (click)="undoValidated(element,ind)" mat-icon-button matTooltip="Deshacer">
+              <button (click)="undoValidated(element,ind,buy.correlative)" mat-icon-button matTooltip="Deshacer">
                 <mat-icon>undo</mat-icon>
               </button>
             </div>
@@ -161,16 +162,17 @@
         <span class="ms-fill"></span>
         <div>
           <button *ngIf="element['validatedStatus']=='por validar'" mat-raised-button color="accent"
-            class="buttonNoRounded" (click)="validated(element,false,ind)" style="width: 110px;">Validar</button>
+            class="buttonNoRounded" (click)="validated(element,false,ind,buy.correlative)"
+            style="width: 110px;">Validar</button>
 
 
           <div *ngIf="element['validatedStatus']=='validado'" class="ms-flex ms-flex--center"
             style="justify-content: center;">
 
-            <button (click)="validated(element,true,ind)" mat-raised-button color="primary" style="margin-right: 8px;"
-              class="buttonNoRounded">Correcto</button>
+            <button (click)="validated(element,true,ind,buy.correlative)" mat-raised-button color="primary"
+              style="margin-right: 8px;" class="buttonNoRounded">Correcto</button>
 
-            <button (click)="undoValidated(element,ind)" mat-icon-button matTooltip="Deshacer">
+            <button (click)="undoValidated(element,ind,buy.correlative)" mat-icon-button matTooltip="Deshacer">
               <mat-icon>undo</mat-icon>
             </button>
           </div>
@@ -178,10 +180,10 @@
           <div *ngIf="element['validatedStatus']=='pendiente'" class="ms-flex ms-flex--center"
             style="justify-content: center;">
 
-            <button (click)="validated(element,true,ind)" mat-raised-button color="accent" style="margin-right: 8px;"
-              class="buttonNoRounded">Pendiente</button>
+            <button (click)="validated(element,true,ind,buy.correlative)" mat-raised-button color="accent"
+              style="margin-right: 8px;" class="buttonNoRounded">Pendiente</button>
 
-            <button (click)="undoValidated(element,ind)" mat-icon-button matTooltip="Deshacer">
+            <button (click)="undoValidated(element,ind,buy.correlative)" mat-icon-button matTooltip="Deshacer">
               <mat-icon>undo</mat-icon>
             </button>
           </div>

@@ -184,6 +184,7 @@ export class ProductsComponent implements OnInit {
 
   checkStock() {
     let reduceOrder = this.dbs.getneworder(this.dbs.order);
+    /*
     this.dbs.saveTransaction(reduceOrder).then((res) => {
       //this.loadCart.next(true)
       let failedItems = [];
@@ -221,7 +222,7 @@ export class ProductsComponent implements OnInit {
         return true;
       }
       return false;
-    });
+    });*/
   }
 
 }

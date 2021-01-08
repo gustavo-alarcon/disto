@@ -31,7 +31,7 @@ import { AngularFireAuth } from "@angular/fire/auth";
   providedIn: "root",
 })
 export class DatabaseService {
-  public version: string = "V1.1.59r";
+  public version: string = "V1.1.61r";
   public isOpen: boolean = false;
   public isAdmin: boolean = false;
   public messageSaw: number = 0;
@@ -57,7 +57,7 @@ export class DatabaseService {
   public sum = new BehaviorSubject<number>(0);
   public sum$ = this.sum.asObservable();
 
-  public productView 
+  public productView
 
   public total: number = 0;
   public delivery: number = 6;
@@ -273,6 +273,7 @@ export class DatabaseService {
     let productRef: DocumentReference;
     let productData: Product;
     let batch = this.afs.firestore.batch();
+    let editStock: DocumentReference;
 
     //Editting
     if (edit) {
@@ -283,6 +284,18 @@ export class DatabaseService {
       productData.id = productRef.id;
       productData.photoURL = oldProduct.photoURL;
       productData.promo = oldProduct.promo;
+      let changeStock = oldProduct.realStock != product.realStock
+      if (changeStock) {
+        editStock = this.afs.firestore
+          .collection(`db/distoProductos/productsList/${oldProduct.id}/stockChange`).doc()
+        batch.set(editStock, {
+          id: editStock.id,
+          description: 'Editar directamente producto',
+          createdAt: new Date(),
+          oldStock: oldProduct.realStock,
+          newStock: product.realStock
+        })
+      }
     }
     //creating
     else {
@@ -340,7 +353,6 @@ export class DatabaseService {
 
     let productData: {
       realStock: firebase.firestore.FieldValue;
-      virtualStock: firebase.firestore.FieldValue;
       mermaStock: firebase.firestore.FieldValue;
     };
     let mermaTransferData: MermaTransfer = {
@@ -359,7 +371,6 @@ export class DatabaseService {
     if (toMerma) {
       productData = {
         realStock: firebase.firestore.FieldValue.increment(-1 * quantity),
-        virtualStock: firebase.firestore.FieldValue.increment(-1 * quantity),
         mermaStock: firebase.firestore.FieldValue.increment(quantity),
       };
     }
@@ -367,7 +378,6 @@ export class DatabaseService {
     else {
       productData = {
         realStock: firebase.firestore.FieldValue.increment(quantity),
-        virtualStock: firebase.firestore.FieldValue.increment(quantity),
         mermaStock: firebase.firestore.FieldValue.increment(-1 * quantity),
       };
     }
@@ -937,52 +947,56 @@ export class DatabaseService {
 
   onDoubleUpdateStock(requestedProductsToDecrease: Sale['requestedProducts'],
     requestedProductsToIncrease: Sale['requestedProducts'],
-    batch: firebase.firestore.WriteBatch){
-      let requestedProductRef: DocumentReference;
+    batch: firebase.firestore.WriteBatch) {
+    let requestedProductRef: DocumentReference;
 
-      let productList: {productId: string; amount: number}[] = [];
-      let foundProduct: {productId: string; amount: number} = null
+    let productList: { productId: string; amount: number }[] = [];
+    let foundProduct: { productId: string; amount: number } = null
 
-      let productId: string=null;
+    let productId: string = null;
 
-      [...requestedProductsToDecrease.map(el => ({...el, decrease: true})), 
-        ...requestedProductsToIncrease.map(el => ({...el, decrease: false}))].forEach(product => {
+    [...requestedProductsToDecrease.map(el => ({ ...el, decrease: true })),
+    ...requestedProductsToIncrease.map(el => ({ ...el, decrease: false }))].forEach(product => {
 
-        if (!product.product.package) {
+      if (!product.product.package) {
 
-          productId = product.product.id
-          foundProduct = productList.find(el => el.productId == productId)
+        productId = product.product.id
+        foundProduct = productList.find(el => el.productId == productId)
 
-          if(foundProduct){
-            foundProduct.amount += product.decrease ? (-1)*product.quantity : product.quantity
-          } else {
-            productList.push({productId: productId, 
-              amount: product.decrease ? (-1)*product.quantity : product.quantity})
-          }
-
+        if (foundProduct) {
+          foundProduct.amount += product.decrease ? (-1) * product.quantity : product.quantity
         } else {
-          product.chosenOptions.forEach((opt, index) => {
-            
-            productId = opt.id
-            foundProduct = productList.find(el => el.productId == productId)
-
-            if(foundProduct){
-              foundProduct.amount += product.decrease ? (-1)*product.quantity : product.quantity
-            } else {
-              productList.push({productId: productId, 
-                amount: product.decrease ? (-1)*product.quantity : product.quantity})
-            }
-
+          productList.push({
+            productId: productId,
+            amount: product.decrease ? (-1) * product.quantity : product.quantity
           })
         }
-      })
 
-      productList.forEach(el => {
-        requestedProductRef = this.afs.firestore.collection(this.productsListRef).doc(el.productId)
-        batch.update(requestedProductRef, { realStock: firebase.firestore.FieldValue.increment(el.amount) });
-      })
-      console.log(productList);
-      return batch
+      } else {
+        product.chosenOptions.forEach((opt, index) => {
+
+          productId = opt.id
+          foundProduct = productList.find(el => el.productId == productId)
+
+          if (foundProduct) {
+            foundProduct.amount += product.decrease ? (-1) * product.quantity : product.quantity
+          } else {
+            productList.push({
+              productId: productId,
+              amount: product.decrease ? (-1) * product.quantity : product.quantity
+            })
+          }
+
+        })
+      }
+    })
+
+    productList.forEach(el => {
+      requestedProductRef = this.afs.firestore.collection(this.productsListRef).doc(el.productId)
+      batch.update(requestedProductRef, { realStock: firebase.firestore.FieldValue.increment(el.amount) });
+    })
+    console.log(productList);
+    return batch
   }
 
   //configuracion
@@ -1075,7 +1089,7 @@ export class DatabaseService {
   getProductsListCategory(category): Observable<Product[]> {
     return this.afs
       .collection<Product>(this.productsListRef, (ref) =>
-        ref.where('category','==',category)
+        ref.where('category', '==', category)
       )
       .get()
       .pipe(
@@ -1088,7 +1102,7 @@ export class DatabaseService {
   getPackagesListCategory(category): Observable<Package[]> {
     return this.afs
       .collection<Package>(this.packagesListRef, (ref) =>
-        ref.where('category','==',category)
+        ref.where('category', '==', category)
       )
       .get()
       .pipe(
@@ -1096,7 +1110,7 @@ export class DatabaseService {
           return snap.docs.map((el) => <Package>el.data());
         })
       );
-  } 
+  }
 
   getneworder(ord) {
     let copy = [...ord];
@@ -1145,10 +1159,11 @@ export class DatabaseService {
     return otherorder;
   }
 
-  saveTransaction(ord) {
+  saveRealStock(ord, sum: boolean) {
+    let newOrder = this.getneworder(ord)
     return this.afs.firestore.runTransaction((transaction) => {
       let promises = [];
-      ord.forEach((order, ind) => {
+      newOrder.forEach((order, ind) => {
         const sfDocRef = this.afs.firestore
           .collection(`/db/distoProductos/productsList`)
           .doc(order.product.id);
@@ -1157,76 +1172,82 @@ export class DatabaseService {
           transaction
             .get(sfDocRef)
             .then((prodDoc) => {
-              let newStock = prodDoc.data().virtualStock - order.reduce;
-              if (newStock >= prodDoc.data().sellMinimum) {
+              if (sum) {
+                let newStock = prodDoc.data().realStock - order.reduce
+                transaction.update(sfDocRef, { realStock: newStock });
+                if (newStock >= prodDoc.data().sellMinimum) {
+                  return {
+                    isSave: true,
+                    product: prodDoc.data().description
+                  }
+                } else {
+                  return {
+                    isSave: false,
+                    product: prodDoc.data().id
+                  }
+                }
+              } else {
+                let newStock = prodDoc.data().realStock + order.reduce
+                transaction.update(sfDocRef, { realStock: newStock });
                 return {
                   isSave: true,
-                  index: ind,
-                };
-              } else {
-                return {
-                  isSave: false,
-                  stock: prodDoc.data().virtualStock - prodDoc.data().sellMinimum,
-                  index: ind,
-                };
+                  product: prodDoc.data().description
+                }
+              }
+
+            })
+            .catch((error) => {
+              console.log("Transaction failed: ", error);
+              return {
+                isSave: false,
+                product: null
+              }
+            })
+        );
+      });
+      return Promise.all(promises);
+    });
+  }
+
+  unsaveRealStock(ord, correlative, sum) {
+    let newOrder = this.getneworder(ord)
+    return this.afs.firestore.runTransaction((transaction) => {
+      let promises = [];
+      newOrder.forEach((order, ind) => {
+        const sfDocRef = this.afs.firestore
+          .collection(`/db/distoProductos/productsList`)
+          .doc(order.product.id);
+        const editStock = this.afs.firestore.collection(`db/distoProductos/productsList/${order.product.id}/stockChange`).doc()
+        promises.push(
+          transaction
+            .get(sfDocRef)
+            .then((prodDoc) => {
+              let newStock
+              if(sum){
+                newStock = prodDoc.data().realStock + order.reduce;
+              }else{
+                newStock = prodDoc.data().realStock - order.reduce;
+              }
+              
+              
+              transaction.update(sfDocRef, { realStock: newStock });
+              transaction.set(editStock, {
+                id: editStock.id,
+                description: sum?'anular venta nº ' + correlative:'deshacer anulación venta nº ' + correlative,
+                createdAt: new Date(),
+                oldStock: prodDoc.data().realStock,
+                newStock: newStock
+              })
+              return {
+                isSave: true,
+                product: prodDoc.data().description
               }
             })
             .catch((error) => {
               console.log("Transaction failed: ", error);
               return {
                 isSave: false,
-                stock: null,
-                index: ind,
-              };
-            })
-        );
-      });
-      return Promise.all(promises);
-    });
-  }
-
-  saveRealStock(ord,sum:boolean) {
-    let newOrder = this.getneworder(ord)
-    return this.afs.firestore.runTransaction((transaction) => {
-      let promises = [];
-      newOrder.forEach((order, ind) => {
-        const sfDocRef = this.afs.firestore
-          .collection(`/db/distoProductos/productsList`)
-          .doc(order.product.id);
-
-        promises.push(
-          transaction
-            .get(sfDocRef)
-            .then((prodDoc) => {
-              if(sum){
-                let newStock = prodDoc.data().realStock - order.reduce
-                transaction.update(sfDocRef, { realStock: newStock });
-                if(newStock>=prodDoc.data().sellMinimum){
-                  return {
-                    isSave:true,
-                    product:prodDoc.data().description
-                  }
-                }else{
-                  return {
-                    isSave:false,
-                    product:prodDoc.data().id
-                  }
-                }
-              }else{
-                let newStock = prodDoc.data().realStock + order.reduce
-                transaction.update(sfDocRef, { realStock: newStock });
-                return {
-                  isSave:true,
-                  product:prodDoc.data().description
-                }
-              }
-              
-            })
-            .catch((error) => {
-              console.log("Transaction failed: ", error);
-              return {
-                isSave:false,
-                product:null
+                product: null
               }
             })
         );
@@ -1235,49 +1256,11 @@ export class DatabaseService {
     });
   }
 
-  unsaveRealStock(ord,sum:boolean) {
-    let newOrder = this.getneworder(ord)
-    return this.afs.firestore.runTransaction((transaction) => {
-      let promises = [];
-      newOrder.forEach((order, ind) => {
-        const sfDocRef = this.afs.firestore
-          .collection(`/db/distoProductos/productsList`)
-          .doc(order.product.id);
-
-        promises.push(
-          transaction
-            .get(sfDocRef)
-            .then((prodDoc) => {
-              let newStock = prodDoc.data().realStock + order.reduce;
-              let newVirtualStock = prodDoc.data().virtualStock + order.reduce;
-              if(sum){
-                transaction.update(sfDocRef, { realStock: newStock, virtualStock:newVirtualStock });
-              }else{
-                transaction.update(sfDocRef, { virtualStock:newVirtualStock });
-              }
-              return {
-                isSave:true,
-                product:prodDoc.data().description
-              }
-            })
-            .catch((error) => {
-              console.log("Transaction failed: ", error);
-              return {
-                isSave:false,
-                product:null
-              }
-            })
-        );
-      });
-      return Promise.all(promises);
-    });
-  }
-
-  getProductsEntry(date: { begin: Date; end: Date }){
+  getProductsEntry(date: { begin: Date; end: Date }) {
     return this.afs
       .collectionGroup<BuyRequestedProduct>("buyRequestedProducts", (ref) =>
         ref.where("requestedDate", "<=", date.end)
-        .where("requestedDate", ">=", date.begin)
+          .where("requestedDate", ">=", date.begin)
       )
       .valueChanges();
   }

@@ -35,7 +35,7 @@ export class ValidatedReturnDialogComponent implements OnInit {
     private auth: AuthService,
     private fb: FormBuilder,
     private af: AngularFirestore,
-    @Inject(MAT_DIALOG_DATA) public data: { item: BuyRequestedProduct }
+    @Inject(MAT_DIALOG_DATA) public data: { item: BuyRequestedProduct, correlative: number }
   ) { }
 
   ngOnInit(): void {
@@ -137,17 +137,24 @@ export class ValidatedReturnDialogComponent implements OnInit {
       )
     ).pipe(take(1)).subscribe(([user, res]) => {
       const ref = this.af.firestore.collection(`/db/distoProductos/productsList`).doc(this.data.item.id);
+      const editStockRef = this.af.firestore.collection(`db/distoProductos/productsList/${this.data.item.id}/stockChange`).doc()
       this.af.firestore.runTransaction((transaction) => {
         return transaction.get(ref).then((prodDoc) => {
           let newStock = prodDoc.data().realStock + this.getStock();
-          let newVirtualStock = prodDoc.data().virtualStock + this.getStock();
           let newMerma = prodDoc.data().mermaStock + this.validatedFormGroup.value['mermaStock'];
           let discount = this.getStock() + this.validatedFormGroup.get('mermaStock').value
           let records = []
           transaction.update(ref, {
             mermaStock: newMerma,
-            realStock: newStock,
-            virtualStock:newVirtualStock
+            realStock: newStock
+          })
+
+          transaction.set(editStockRef, {
+            id: editStockRef.id,
+            description: 'validar devolucion compra nº ' + this.data.correlative,
+            createdAt: new Date(),
+            oldStock: prodDoc.data().realStock,
+            newStock: newStock
           })
 
           if (this.data.item.returnedRecord) {
@@ -187,7 +194,7 @@ export class ValidatedReturnDialogComponent implements OnInit {
             returnedRecord: records
           })
 
-          
+
 
         });
       }).then(() => {
