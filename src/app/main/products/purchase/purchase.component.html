@@ -22,7 +22,7 @@
         </p>
         <div class="container" style="align-items: baseline">
           <div *ngIf="scroll$ | async"></div>
-          <div *ngIf="userData$ | async" style="width: 100%; max-width: 420px">
+          <div *ngIf="(userData$ | async) || dbs.expressCustomer" style="width: 100%; max-width: 420px">
             <div>
               <mat-horizontal-stepper linear #stepper class="ms-stepper">
                 <mat-step label="📝" [stepControl]="firstFormGroup" [completed]="firstFormGroup.valid">

@@ -18,19 +18,19 @@
 
         <div class="w3-margin-top">
             <button mat-raised-button color="accent" class="w3-block w3-margin-bottom social social--register"
-                (click)="auth.signIn('google')">
+                (click)="toggleRegister()">
                 <div class="ms-flex">
                     <div class="w3-display-container w3-center social_icon">
-                        <img src="../../../assets/svg/mail-ios-disto.svg" alt="social icon">
+                        <img src="../../../assets/svg/arroba.svg" alt="social icon">
                     </div>
                     
                     <span class="ms-fill">Ingresar con <strong>Mail y Contraseña</strong></span>
                 </div>
             </button>
-            <div style="display: none;">
+            <div class="registerForm" [ngClass]="{'formHidden': formHidden, 'formVisible': !formHidden}">
                 <form [formGroup]="dataFormGroup">
                     <mat-form-field class="w3-block w3-small" appearance="outline">
-                        <mat-label>Usuario</mat-label>
+                        <mat-label>Correo</mat-label>
                         <input matInput type="email" autocapitalize="none" formControlName="email"
                             placeholder="Correo electrónico" autocomplete="off">
                         <mat-error>
@@ -78,10 +78,10 @@
                 (click)="auth.signIn('google')">
                 <div class="ms-flex">
                     <div class="w3-display-container w3-center social_icon">
-                        <img src="../../../assets/svg/gmail-icon-disto.svg" alt="google icon">
+                        <img src="../../../assets/svg/mail.svg" alt="google icon">
                     </div>
                     
-                    <span class="ms-fill">Ingresar con <strong>Google</strong></span>
+                    <span class="ms-fill">Ingresar con <strong>Gmail</strong></span>
                 </div>
                 
             </button>
@@ -89,20 +89,20 @@
                 (click)="auth.signIn('facebook')">
                 <div class="ms-flex">
                     <div class="w3-display-container w3-center social_icon">
-                        <img src="../../../assets/svg/facebook-disto.svg" alt="facebook icon">
+                        <img src="../../../assets/svg/facebook.svg" alt="facebook icon">
                     </div>
                     
                     <span class="ms-fill">Ingresar con <strong>Facebook</strong></span>
                 </div>
             </button>
             <button mat-raised-button color="accent" class="w3-block w3-margin-bottom social social--express"
-                (click)="auth.signIn('google')">
+                (click)="continueAsExpress()">
                 <div class="ms-flex">
                     <div class="w3-display-container w3-center social_icon">
                         <img src="../../../assets/svg/cheese-disto.svg" alt="express icon">
                     </div>
                     
-                    <span class="ms-fill">Compra <strong>Express</strong></span>
+                    <span class="ms-fill">Continuar <strong>SIN REGISTRO</strong></span>
                 </div>
             </button>
             <p *ngIf="auth$ | async"></p>

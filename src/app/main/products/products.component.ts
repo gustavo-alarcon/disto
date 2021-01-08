@@ -70,6 +70,8 @@ export class ProductsComponent implements OnInit {
 
     this.products$ = this.route.fragment.pipe(
       switchMap(route=>{
+        // console.log('Categoría: ', route);
+        
         return combineLatest(
           this.dbs.getProductsListCategory(route),
           this.dbs.getPackagesListCategory(route),

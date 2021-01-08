@@ -14,6 +14,7 @@ import { Component, OnInit, Input, ViewChild, ElementRef, Renderer2 } from '@ang
 import { ScrollDispatcher } from '@angular/cdk/overlay';
 import { Router } from '@angular/router';
 import { SalesVideoComponent } from '../sales-video/sales-video.component';
+import { ExpressUser } from 'src/app/core/models/express-user';
 
 @Component({
   selector: 'app-purchase',
@@ -23,7 +24,7 @@ import { SalesVideoComponent } from '../sales-video/sales-video.component';
 export class PurchaseComponent implements OnInit {
   user: User = null
 
-  firstSale: boolean = false
+  firstSale: boolean = true;
 
   loading = new BehaviorSubject<boolean>(false);
   loading$ = this.loading.asObservable();
@@ -161,19 +162,20 @@ export class PurchaseComponent implements OnInit {
 
     this.userData$ = this.auth.user$.pipe(
       tap(res => {
-        this.user = res
-        if (res["salesCount"]) {
-          this.firstSale = false;
-        } else {
-          this.firstSale = true;
-        }
+        if (res) {
+          this.user = res
+          if (res["salesCount"]) {
+            this.firstSale = false;
+          } else {
+            this.firstSale = true;
+          }
 
-        if (res["contact"]) {
-          this.name = res.name.split(" ")[0];
-          this.dbs.delivery = res.contact.district.delivery;
+          if (res["contact"]) {
+            this.name = res.name.split(" ")[0];
+            this.dbs.delivery = res.contact.district.delivery;
+          }
+          this.getData()
         }
-        this.getData()
-
       })
     )
 
@@ -339,7 +341,9 @@ export class PurchaseComponent implements OnInit {
       );
   }
 
-  updateUser() {
+  updateUser(): void {
+    if (this.dbs.expressCustomer) return;
+
     this.user.name = this.firstFormGroup.get('name').value
     this.user.lastName1 = this.firstFormGroup.get('lastname1').value
     this.user.lastName2 = this.firstFormGroup.get('lastname2').value
@@ -454,6 +458,16 @@ export class PurchaseComponent implements OnInit {
     const saleCount = this.af.firestore.collection(`/db/distoProductos/config/`).doc('generalConfig');
     const saleRef = this.af.firestore.collection(`/db/distoProductos/sales`).doc();
 
+    let expressUser = new User();
+
+    expressUser.name = this.firstFormGroup.value['name'];
+    expressUser.lastName1 = this.firstFormGroup.value['lastname1'];
+    expressUser.lastName2 = this.firstFormGroup.value['lastname2'];
+    expressUser.email = this.firstFormGroup.value['email'];
+    expressUser.dni = this.firstFormGroup.value['dni'];
+
+    console.log(expressUser);
+
     let newSale: Sale = {
       id: saleRef.id,
       correlative: 0,
@@ -476,7 +490,7 @@ export class PurchaseComponent implements OnInit {
       requestDate: null,
       createdAt: new Date(),
       createdBy: null,
-      user: this.user,
+      user: this.dbs.expressCustomer ? expressUser : this.user,
       requestedProducts: this.dbs.order,
       status: 'Solicitado',
       total: this.total,
@@ -486,21 +500,8 @@ export class PurchaseComponent implements OnInit {
       transactionCliente: list
     }
 
-    const email = {
-      to: this.user.email,
-      template: {
-        name: 'saleEmail'
-      }
-    }
-    const emailRef = this.af.firestore.collection(`/mail`).doc();
-
-    let userCorrelative = 1
-    const ref = this.af.firestore.collection(`/users`).doc(this.user.uid);
 
 
-    if (this.user.salesCount) {
-      userCorrelative = this.user.salesCount + 1
-    }
 
     let photos = [...this.photos.data.map(el => this.dbs.uploadPhotoVoucher(saleRef.id, el))]
 
@@ -530,19 +531,41 @@ export class PurchaseComponent implements OnInit {
           transaction.update(saleCount, { salesRCounter: newCorr });
 
           newSale.correlative = newCorr
-
+          console.log(newSale);
+          
           transaction.set(saleRef, newSale);
-          //email
-          transaction.set(emailRef, email)
-          //user
-          transaction.update(ref, {
-            contact: newSale.location,
-            name: this.firstFormGroup.value['name'],
-            lastName1: this.firstFormGroup.value['lastname1'],
-            lastName2: this.firstFormGroup.value['lastname2'],
-            dni: this.firstFormGroup.value['dni'],
-            salesCount: userCorrelative
-          })
+
+          // Expreess customer
+          if (!this.dbs.expressCustomer) {
+            const email = {
+              to: this.user.email,
+              template: {
+                name: 'saleEmail'
+              }
+            }
+            const emailRef = this.af.firestore.collection(`/mail`).doc();
+
+            let userCorrelative = 1
+            const ref = this.af.firestore.collection(`/users`).doc(this.user.uid);
+
+
+            if (this.user.salesCount) {
+              userCorrelative = this.user.salesCount + 1
+            }
+
+            //email
+            transaction.set(emailRef, email)
+            //user
+            transaction.update(ref, {
+              contact: newSale.location,
+              name: this.firstFormGroup.value['name'],
+              lastName1: this.firstFormGroup.value['lastname1'],
+              lastName2: this.firstFormGroup.value['lastname2'],
+              dni: this.firstFormGroup.value['dni'],
+              salesCount: userCorrelative
+            })
+          }
+
 
         });
 
@@ -551,7 +574,7 @@ export class PurchaseComponent implements OnInit {
           data: {
             name: this.firstFormGroup.value['name'],
             number: newSale.correlative,
-            email: this.user.email
+            email: this.dbs.expressCustomer ? expressUser.email : this.user.email
           }
         })
 
@@ -561,11 +584,13 @@ export class PurchaseComponent implements OnInit {
         this.router.navigate(["/main/products"], { fragment: this.dbs.productView });
         //this.dbs.view.next(1)
         this.loading.next(false)
-      }).catch(function (error) {
+      }).catch(error => {
+        console.log(error);
         this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
       });
     })
   }
+
   openVideo(): void {
     this.dialog.open(SalesVideoComponent);
   }

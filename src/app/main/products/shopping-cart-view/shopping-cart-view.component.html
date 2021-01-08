@@ -21,7 +21,7 @@
           </app-shopping-cart>
         </div>
 
-        <button *ngIf="auth.user$ | async; else register" mat-raised-button color="accent" class="w3-block"
+        <button *ngIf="(auth.user$ | async) || dbs.expressCustomer ; else register" mat-raised-button color="accent" class="w3-block"
           style="font-weight: bold" routerLink="/main/products/compra" [disabled]="dbs.order.length == 0">
           Continuar con la compra
           <mat-icon class="w3-margin-left">arrow_forward</mat-icon>

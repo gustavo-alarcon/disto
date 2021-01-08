@@ -65,6 +65,8 @@ export class DatabaseService {
   // public opening = new BehaviorSubject<Array<{ opening: string, closing: string }>>([]);
   public opening$: Observable<Array<{ opening: string; closing: string }>>;
 
+  public expressCustomer = false;
+
   constructor(
     private afs: AngularFirestore,
     private storage: AngularFireStorage,
