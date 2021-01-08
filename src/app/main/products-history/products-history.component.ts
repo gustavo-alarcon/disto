@@ -80,6 +80,7 @@ export class ProductsHistoryComponent implements OnInit {
                 return {
                   name: sal.correlative,
                   products: this.dbs.getneworder(sal.requestedProducts),
+                  status:sal.status
                 };
               });
             })

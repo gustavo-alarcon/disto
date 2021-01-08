@@ -128,5 +128,5 @@ export interface Sale {
   editedBy?: User
 
   transactionCliente?:any;
-  transactionSale?:any;
+  allSave?:boolean;
 }

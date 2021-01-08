@@ -36,7 +36,7 @@ export class ValidatedDialogComponent implements OnInit {
     private auth: AuthService,
     private fb: FormBuilder,
     private af: AngularFirestore,
-    @Inject(MAT_DIALOG_DATA) public data: { item: BuyRequestedProduct, edit: true }
+    @Inject(MAT_DIALOG_DATA) public data: { item: BuyRequestedProduct, edit: true,correlative:number }
   ) { }
 
   ngOnInit(): void {
@@ -146,6 +146,8 @@ export class ValidatedDialogComponent implements OnInit {
     const ref = this.af.firestore.collection(`/db/distoProductos/productsList`).doc(this.data.item.id);
     const transferHistoryRef = this.af.firestore.collection(this.dbs.productsListRef + `/${this.data.item.id}/mermaTransfer`).doc();
 
+    const editStockRef = this.af.firestore.collection(`db/distoProductos/productsList/${this.data.item.id}/stockChange`).doc()
+
     combineLatest(
       this.auth.user$,
       this.dbs.getBuyRequestedProducts(this.data.item.buyId).pipe(
@@ -174,13 +176,19 @@ export class ValidatedDialogComponent implements OnInit {
         this.af.firestore.runTransaction((transaction) => {
           return transaction.get(ref).then((prodDoc) => {
             let newStock = prodDoc.data().realStock + difSt;
-            let newVirtualStock = prodDoc.data().virtualStock + difSt;
             let newMerma = prodDoc.data().mermaStock + difMerm;
             transaction.update(ref, {
               realStock: newStock,
-              mermaStock: newMerma,
-              virtualStock:newVirtualStock
+              mermaStock: newMerma
             });
+
+            transaction.set(editStockRef, {
+              id: editStockRef.id,
+              description: 'anulado en logistica, compra nº' + this.data.correlative,
+              createdAt: new Date(),
+              oldStock: prodDoc.data().realStock,
+              newStock: newStock
+            })
 
             if (difMerm != 0) {
               let mermaTransferData: MermaTransfer = {

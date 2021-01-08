@@ -40,7 +40,7 @@ export class ProductsListComponent implements OnInit {
   productsDisplayedColumns: string[] = [
     'index', 'photoURL', 'description', 'sku', 'category', 'price',
     'unitDescription', 'unitAbbreviation', 'unitWeight', 'sellMinimum', 'alertMinimum',
-    'realStock', /*'mermaStock',*/ 'virtualStock', 'published', 'actions'
+    'realStock', /*'mermaStock',*/ 'published', 'actions'
   ]
 
   productsObservable$: Observable<Product[]>
@@ -357,7 +357,7 @@ export class ProductsListComponent implements OnInit {
     let headersXlsx = [
       'Descripcion', 'SKU', 'Categoría', 'Precio',
       'Descripción de Unidad', 'Abreviación', 'Peso (KG)', 'Stock Real', 'Mínimo de venta', 'Mínimio de alerta',
-      'Stock de merma', 'Stock Virtual', 'Publicado'
+      'Stock de merma', 'Publicado'
     ]
 
     table_xlsx.push(headersXlsx);
@@ -375,7 +375,6 @@ export class ProductsListComponent implements OnInit {
         product.sellMinimum,
         product.alertMinimum,
         product.mermaStock,
-        0, //virtualStock
         product.published ? "Sí" : "No"
       ];
 
@@ -401,14 +400,11 @@ export class ProductsListComponent implements OnInit {
       batch.update(sfDocRef,{
         virtualStock: product.realStock
       })
-      if(ind==this.productsTableDataSource.filteredData.length-1){
-        batch.commit().then(res=>{
-          console.log('all');
-          
-        })
-      }
     })
-    
+    batch.commit().then(res=>{
+      console.log('all');
+      
+    })
 
   }
 }

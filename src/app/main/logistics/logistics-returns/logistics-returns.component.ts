@@ -147,11 +147,12 @@ export class LogisticsReturnsComponent implements OnInit {
     )
   }
 
-  validated(product: BuyRequestedProduct, ind) {
+  validated(product: BuyRequestedProduct, ind, corr) {
 
     this.dialog.open(ValidatedReturnDialogComponent, {
       data: {
-        item: product
+        item: product,
+        correlative: corr
       }
     }).afterClosed().pipe(
       take(1)
@@ -160,10 +161,11 @@ export class LogisticsReturnsComponent implements OnInit {
     })
   }
 
-  undoValidated(product: BuyRequestedProduct, ind) {
+  undoValidated(product: BuyRequestedProduct, ind, corr) {
     this.dialog.open(UndoReturnDialogComponent, {
       data: {
-        item: product
+        item: product,
+        correlative: corr
       }
     }).afterClosed().pipe(
       take(1)
