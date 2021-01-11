@@ -21,6 +21,7 @@ import { LoginDialogComponent } from './login-dialog/login-dialog.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatInputModule } from '@angular/material/input';
 import { ProviderDialogComponent } from './provider-dialog/provider-dialog.component';
+import { PurchaseTypeComponent } from './purchase-type/purchase-type.component';
 
 
 @NgModule({
@@ -28,7 +29,8 @@ import { ProviderDialogComponent } from './provider-dialog/provider-dialog.compo
     MainComponent,
     ConfirmationDialogComponent,
     LoginDialogComponent,
-    ProviderDialogComponent
+    ProviderDialogComponent,
+    PurchaseTypeComponent
   ],
   imports: [
     CommonModule,

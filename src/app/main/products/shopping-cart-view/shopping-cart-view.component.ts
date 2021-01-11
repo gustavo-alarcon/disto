@@ -2,9 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { take, takeLast } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { DatabaseService } from 'src/app/core/services/database.service';
 import { LoginDialogComponent } from '../../login-dialog/login-dialog.component';
+import { PurchaseTypeComponent } from '../../purchase-type/purchase-type.component';
+import { PurchaseComponent } from '../purchase/purchase.component';
 
 @Component({
   selector: 'app-shopping-cart-view',
@@ -13,7 +16,7 @@ import { LoginDialogComponent } from '../../login-dialog/login-dialog.component'
 })
 export class ShoppingCartViewComponent implements OnInit {
 
-  loadCart$:Observable<any>
+  loadCart$: Observable<any>
 
   constructor(
     public dbs: DatabaseService,
@@ -45,10 +48,10 @@ export class ShoppingCartViewComponent implements OnInit {
   back(route) {
     if (route) {
       this.router.navigate(["/main"]);
-    }else{
-      if(this.dbs.productView){
+    } else {
+      if (this.dbs.productView) {
         this.router.navigate(['/main/products'], { fragment: this.dbs.productView });
-      }else{
+      } else {
         this.router.navigate(["/main"]);
       }
     }
@@ -73,7 +76,15 @@ export class ShoppingCartViewComponent implements OnInit {
   }
 
   login() {
-    this.dialog.open(LoginDialogComponent);
+    this.dialog.open(LoginDialogComponent)
+      .afterClosed()
+      .pipe(takeLast(1))
+      .subscribe(res => {
+        if (res) {
+          this.router.navigateByUrl('/main/products/compra');
+        }
+
+      })
     localStorage.setItem("order", "true");
     localStorage.setItem("length", this.dbs.order.length.toString());
     localStorage.setItem("dbsorder", JSON.stringify(this.dbs.order));

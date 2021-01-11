@@ -14,6 +14,7 @@ import { Component, OnInit, Input, ViewChild, ElementRef, Renderer2 } from '@ang
 import { ScrollDispatcher } from '@angular/cdk/overlay';
 import { Router } from '@angular/router';
 import { SalesVideoComponent } from '../sales-video/sales-video.component';
+import { ExpressUser } from 'src/app/core/models/express-user';
 
 @Component({
   selector: 'app-purchase',
@@ -23,7 +24,7 @@ import { SalesVideoComponent } from '../sales-video/sales-video.component';
 export class PurchaseComponent implements OnInit {
   user: User = null
 
-  firstSale: boolean = false
+  firstSale: boolean = true;
 
   loading = new BehaviorSubject<boolean>(false);
   loading$ = this.loading.asObservable();
@@ -87,8 +88,13 @@ export class PurchaseComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+
+    if(this.dbs.order.length == 0){
+      this.router.navigateByUrl('main/products/carrito');
+    }
+
     let date = new Date()
-    this.now = new Date(date.getTime() + (345600000))
+    this.now = new Date(date.getTime() + (345600000));
 
     this.scroll$ = this.scroll.scrolled().pipe(
       tap((data) => {
@@ -161,19 +167,20 @@ export class PurchaseComponent implements OnInit {
 
     this.userData$ = this.auth.user$.pipe(
       tap(res => {
-        this.user = res
-        if (res["salesCount"]) {
-          this.firstSale = false;
-        } else {
-          this.firstSale = true;
-        }
+        if (res) {
+          this.user = res
+          if (res["salesCount"]) {
+            this.firstSale = false;
+          } else {
+            this.firstSale = true;
+          }
 
-        if (res["contact"]) {
-          this.name = res.name.split(" ")[0];
-          this.dbs.delivery = res.contact.district.delivery;
+          if (res["contact"]) {
+            this.name = res.name.split(" ")[0];
+            this.dbs.delivery = res.contact.district.delivery;
+          }
+          this.getData()
         }
-        this.getData()
-
       })
     )
 
@@ -339,7 +346,9 @@ export class PurchaseComponent implements OnInit {
       );
   }
 
-  updateUser() {
+  updateUser(): void {
+    if (this.dbs.expressCustomer) return;
+
     this.user.name = this.firstFormGroup.get('name').value
     this.user.lastName1 = this.firstFormGroup.get('lastname1').value
     this.user.lastName2 = this.firstFormGroup.get('lastname2').value
@@ -391,7 +400,10 @@ export class PurchaseComponent implements OnInit {
           this.save()
         }
       } else {
-        this.payFormGroup.markAllAsTouched()
+        this.snackbar.open('Complete la información del formulario', 'Aceptar', {
+          duration: 6000
+        });
+        this.payFormGroup.markAllAsTouched();
       }
     } else {
       this.snackbar.open('Parece que hubo un problema, complete todos los campos anteriores', 'cerrar')
@@ -401,6 +413,13 @@ export class PurchaseComponent implements OnInit {
 
 
   save() {
+    if (!this.payFormGroup.valid) {
+      this.snackbar.open('Complete la información del formulario', 'Aceptar', {
+        duration: 6000
+      });
+      return;
+    }
+
     this.loading.next(true)
     let reduceOrder = this.dbs.getneworder(this.dbs.order)
     this.af.firestore.runTransaction((transaction) => {
@@ -497,9 +516,30 @@ export class PurchaseComponent implements OnInit {
 
   savePurchase(list) {
 
+    if (!this.payFormGroup.valid) {
+      this.snackbar.open('Complete la información del formulario', 'Aceptar', {
+        duration: 6000
+      });
+      return;
+    }
+
     const saleCount = this.af.firestore.collection(`/db/distoProductos/config/`).doc('generalConfig');
     const saleRef = this.af.firestore.collection(`/db/distoProductos/sales`).doc();
 
+    let customObject: User = new User();
+
+    customObject.name = this.firstFormGroup.value['name'];
+    customObject.lastName1 = this.firstFormGroup.value['lastname1'];
+    customObject.lastName2 = this.firstFormGroup.value['lastname2'];
+    customObject.email = this.firstFormGroup.value['email'];
+    customObject.dni = this.firstFormGroup.value['dni'];
+
+    let expressUser = {...customObject};
+
+    console.log(this.dbs.expressCustomer);
+    if (!this.dbs.expressCustomer) this.user.email = this.firstFormGroup.value['email'];
+    console.log(this.user.email);
+    
     let newSale: Sale = {
       id: saleRef.id,
       correlative: 0,
@@ -522,7 +562,7 @@ export class PurchaseComponent implements OnInit {
       requestDate: null,
       createdAt: new Date(),
       createdBy: null,
-      user: this.user,
+      user: this.dbs.expressCustomer ? expressUser : this.user,
       requestedProducts: this.dbs.order,
       status: 'Solicitado',
       total: this.total,
@@ -533,16 +573,9 @@ export class PurchaseComponent implements OnInit {
       allSave: list.reduce((a, b) => a && b.isSave, true)
     }
 
-    const email = {
-      to: this.user.email,
-      template: {
-        name: 'saleEmail'
-      }
-    }
-    const emailRef = this.af.firestore.collection(`/mail`).doc();
+    console.log(newSale.user);
+    
 
-    let userCorrelative = 1
-    const ref = this.af.firestore.collection(`/users`).doc(this.user.uid);
 
     if (this.user.salesCount) {
       userCorrelative = this.user.salesCount + 1
@@ -577,22 +610,58 @@ export class PurchaseComponent implements OnInit {
 
           newSale.correlative = newCorr
           transaction.set(saleRef, newSale);
-          //email
-          transaction.set(emailRef, email)
-          //user
-          transaction.update(ref, {
-            contact: newSale.location,
-            name: this.firstFormGroup.value['name'],
-            lastName1: this.firstFormGroup.value['lastname1'],
-            lastName2: this.firstFormGroup.value['lastname2'],
-            dni: this.firstFormGroup.value['dni'],
-            salesCount: userCorrelative
-          })
+
+          // Expreess customer
+          if (!this.dbs.expressCustomer) {
+            const email = {
+              to: this.user.email,
+              template: {
+                name: 'saleEmail'
+              }
+            }
+            const emailRef = this.af.firestore.collection(`/mail`).doc();
+
+            let userCorrelative = 1
+            const ref = this.af.firestore.collection(`/users`).doc(this.user.uid);
+
+
+            if (this.user.salesCount) {
+              userCorrelative = this.user.salesCount + 1
+            }
+
+            //email
+            transaction.set(emailRef, email)
+            //user
+            transaction.update(ref, {
+              contact: newSale.location,
+              name: this.firstFormGroup.value['name'],
+              lastName1: this.firstFormGroup.value['lastname1'],
+              lastName2: this.firstFormGroup.value['lastname2'],
+              dni: this.firstFormGroup.value['dni'],
+              salesCount: userCorrelative
+            })
+          }
+
 
         });
 
       }).then(() => {
+        this.dialog.open(SaleDialogComponent, {
+          data: {
+            name: this.firstFormGroup.value['name'],
+            number: newSale.correlative,
+            email: this.dbs.expressCustomer ? expressUser.email : this.user.email
+          }
+        });
 
+        this.dbs.order = [];
+        this.dbs.orderObs.next([]);
+        this.dbs.total = 0;
+        this.router.navigate(["/main/products"], { fragment: this.dbs.productView });
+        //this.dbs.view.next(1)
+        this.loading.next(false)
+      }).catch(error => {
+        console.log(error);
         this.saveStock(list, newSale.correlative)
 
       }).catch(function (error) {
@@ -600,6 +669,7 @@ export class PurchaseComponent implements OnInit {
       });
     })
   }
+
   openVideo(): void {
     this.dialog.open(SalesVideoComponent);
   }

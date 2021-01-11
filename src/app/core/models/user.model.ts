@@ -1,4 +1,4 @@
-export interface User {
+export class User {
   uid: string;
   email: string;
   dni?: number;
@@ -28,6 +28,40 @@ export interface User {
     };
     reference: string;
     phone: number;
-  },
+  };
   salesCount?: number
+
+  constructor() {
+    this.uid = '';
+    this.email = '';
+    this.dni = 0;
+    this.phone = '';
+    this.photoURL = '';
+    this.name = '';
+    this.lastName1 = '';
+    this.lastName2 = '';
+    this.completeName = '';
+    this.displayName = '';
+    this.token = '';
+    this.admin = false;
+    this.seller = false;
+    this.logistic = false;
+    this.accountant = false;
+    this.role = null;
+    this.lastLogin = new Date();
+    this.contact = {
+      address: '',
+      district: {
+        delivery: 0,
+        name: ''
+      },
+      coord: {
+        lat: 0,
+        lng: 0
+      },
+      reference: '',
+      phone: 0
+    };
+    this.salesCount = 0
+  }
 }

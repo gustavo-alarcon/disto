@@ -1,6 +1,7 @@
 import { User } from 'src/app/core/models/user.model';
 import { Product } from './product.model';
 import { Package } from './package.model';
+import { ExpressUser } from './express-user';
 
 export class saleStatusOptions {
   requested = 'Solicitado';
@@ -51,7 +52,7 @@ export interface Sale {
   },
 
   userId?: string;
-  user: User;                   //requesting user
+  user: User;     //requesting user
   requestDate: Date,            //Fecha deseada por cliente
 
   //A partir de este punto, todo varia de acuerdo
