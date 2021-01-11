@@ -89,7 +89,7 @@ export class PurchaseComponent implements OnInit {
 
   ngOnInit(): void {
 
-    if(this.dbs.order.length == 0){
+    if (this.dbs.order.length == 0) {
       this.router.navigateByUrl('main/products/carrito');
     }
 
@@ -495,7 +495,6 @@ export class PurchaseComponent implements OnInit {
     })
 
     batch.commit().then(() => {
-      console.log('here');
       this.dialog.open(SaleDialogComponent, {
         data: {
           name: this.firstFormGroup.value['name'],
@@ -534,12 +533,12 @@ export class PurchaseComponent implements OnInit {
     customObject.email = this.firstFormGroup.value['email'];
     customObject.dni = this.firstFormGroup.value['dni'];
 
-    let expressUser = {...customObject};
+    let expressUser = { ...customObject };
 
     console.log(this.dbs.expressCustomer);
     if (!this.dbs.expressCustomer) this.user.email = this.firstFormGroup.value['email'];
     console.log(this.user.email);
-    
+
     let newSale: Sale = {
       id: saleRef.id,
       correlative: 0,
@@ -638,25 +637,9 @@ export class PurchaseComponent implements OnInit {
         });
 
       }).then(() => {
-        this.dialog.open(SaleDialogComponent, {
-          data: {
-            name: this.firstFormGroup.value['name'],
-            number: newSale.correlative,
-            email: this.dbs.expressCustomer ? expressUser.email : this.user.email
-          }
-        });
-
-        this.dbs.order = [];
-        this.dbs.orderObs.next([]);
-        this.dbs.total = 0;
-        this.router.navigate(["/main/products"], { fragment: this.dbs.productView });
-        //this.dbs.view.next(1)
-        this.loading.next(false)
+        this.saveStock(list, newSale.correlative)
       }).catch(error => {
         console.log(error);
-        this.saveStock(list, newSale.correlative)
-
-      }).catch(function (error) {
         this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
       });
     })
