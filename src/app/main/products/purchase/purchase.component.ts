@@ -491,6 +491,10 @@ export class PurchaseComponent implements OnInit {
 
     let expressUser = {...customObject};
 
+    console.log(this.dbs.expressCustomer);
+    if (!this.dbs.expressCustomer) this.user.email = this.firstFormGroup.value['email'];
+    console.log(this.user.email);
+    
     let newSale: Sale = {
       id: saleRef.id,
       correlative: 0,
