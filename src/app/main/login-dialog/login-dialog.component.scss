@@ -5,21 +5,59 @@
     width: 80%;
 }
 
-.social--register {
-    background: #fcd652;
+.social--express {
+    background: #FFC934;
+    color: #2b2b2b;
 }
 
 .social--google {
-    background: #5FA73A;
+    background: #EA4335;
     color: white;
 }
 
 .social--facebook {
-    background: #267034;
+    background: #3C5A9A;
     color: white;
 }
 
-.password{
+.social--register {
+    background: #5da92f;
+    color: white;
+}
+
+.social_icon {
+    // filter: grayscale(1);
+
+    & img {
+        width: 22px;
+    }
+    
+}
+
+.password {
     cursor: pointer;
 }
 
+.info {
+    font-size: 12px;
+    font-weight: 400;
+    color: #2b2b2b;
+    margin-top: 0px;
+    border: 2px dashed #5da92f;
+    border-radius: 5px;
+    padding: 8px;
+}
+
+.registerForm {
+    transition: 300ms ease-in-out;
+}
+
+.formHidden {
+    height: 0px;
+    transform: scaleY(0);
+}
+
+.formVisible {
+    height: 200px;
+    transform: scaleY(1);
+}
