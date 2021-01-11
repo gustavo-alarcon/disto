@@ -32,17 +32,17 @@ export class User {
   salesCount?: number
 
   constructor() {
-    this.uid = null;
-    this.email = null;
-    this.dni = null;
-    this.phone = null;
-    this.photoURL = null;
-    this.name = null;
-    this.lastName1 = null;
-    this.lastName2 = null;
-    this.completeName = null;
-    this.displayName = null;
-    this.token = null;
+    this.uid = '';
+    this.email = '';
+    this.dni = 0;
+    this.phone = '';
+    this.photoURL = '';
+    this.name = '';
+    this.lastName1 = '';
+    this.lastName2 = '';
+    this.completeName = '';
+    this.displayName = '';
+    this.token = '';
     this.admin = false;
     this.seller = false;
     this.logistic = false;
@@ -50,18 +50,18 @@ export class User {
     this.role = null;
     this.lastLogin = new Date();
     this.contact = {
-      address: null,
+      address: '',
       district: {
-        delivery: null,
-        name: null
+        delivery: 0,
+        name: ''
       },
       coord: {
-        lat: null,
-        lng: null
+        lat: 0,
+        lng: 0
       },
-      reference: null,
-      phone: null
+      reference: '',
+      phone: 0
     };
-    this.salesCount = null
+    this.salesCount = 0
   }
 }

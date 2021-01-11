@@ -88,8 +88,13 @@ export class PurchaseComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+
+    if(this.dbs.order.length == 0){
+      this.router.navigateByUrl('main/products/carrito');
+    }
+
     let date = new Date()
-    this.now = new Date(date.getTime() + (345600000))
+    this.now = new Date(date.getTime() + (345600000));
 
     this.scroll$ = this.scroll.scrolled().pipe(
       tap((data) => {
@@ -395,7 +400,10 @@ export class PurchaseComponent implements OnInit {
           this.save()
         }
       } else {
-        this.payFormGroup.markAllAsTouched()
+        this.snackbar.open('Complete la información del formulario', 'Aceptar', {
+          duration: 6000
+        });
+        this.payFormGroup.markAllAsTouched();
       }
     } else {
       this.snackbar.open('Parece que hubo un problema, complete todos los campos anteriores', 'cerrar')
@@ -405,6 +413,13 @@ export class PurchaseComponent implements OnInit {
 
 
   save() {
+    if (!this.payFormGroup.valid) {
+      this.snackbar.open('Complete la información del formulario', 'Aceptar', {
+        duration: 6000
+      });
+      return;
+    }
+
     this.loading.next(true)
     let reduceOrder = this.dbs.getneworder(this.dbs.order)
     this.af.firestore.runTransaction((transaction) => {
@@ -455,18 +470,26 @@ export class PurchaseComponent implements OnInit {
   }
 
   savePurchase(list) {
+
+    if (!this.payFormGroup.valid) {
+      this.snackbar.open('Complete la información del formulario', 'Aceptar', {
+        duration: 6000
+      });
+      return;
+    }
+
     const saleCount = this.af.firestore.collection(`/db/distoProductos/config/`).doc('generalConfig');
     const saleRef = this.af.firestore.collection(`/db/distoProductos/sales`).doc();
 
-    let expressUser = new User();
+    let customObject: User = new User();
 
-    expressUser.name = this.firstFormGroup.value['name'];
-    expressUser.lastName1 = this.firstFormGroup.value['lastname1'];
-    expressUser.lastName2 = this.firstFormGroup.value['lastname2'];
-    expressUser.email = this.firstFormGroup.value['email'];
-    expressUser.dni = this.firstFormGroup.value['dni'];
+    customObject.name = this.firstFormGroup.value['name'];
+    customObject.lastName1 = this.firstFormGroup.value['lastname1'];
+    customObject.lastName2 = this.firstFormGroup.value['lastname2'];
+    customObject.email = this.firstFormGroup.value['email'];
+    customObject.dni = this.firstFormGroup.value['dni'];
 
-    console.log(expressUser);
+    let expressUser = {...customObject};
 
     let newSale: Sale = {
       id: saleRef.id,
@@ -500,6 +523,8 @@ export class PurchaseComponent implements OnInit {
       transactionCliente: list
     }
 
+    console.log(newSale.user);
+    
 
 
 
@@ -576,11 +601,11 @@ export class PurchaseComponent implements OnInit {
             number: newSale.correlative,
             email: this.dbs.expressCustomer ? expressUser.email : this.user.email
           }
-        })
+        });
 
-        this.dbs.order = []
-        this.dbs.orderObs.next([])
-        this.dbs.total = 0
+        this.dbs.order = [];
+        this.dbs.orderObs.next([]);
+        this.dbs.total = 0;
         this.router.navigate(["/main/products"], { fragment: this.dbs.productView });
         //this.dbs.view.next(1)
         this.loading.next(false)
