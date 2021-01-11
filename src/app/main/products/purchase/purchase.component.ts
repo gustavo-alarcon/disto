@@ -573,14 +573,6 @@ export class PurchaseComponent implements OnInit {
       allSave: list.reduce((a, b) => a && b.isSave, true)
     }
 
-    console.log(newSale.user);
-    
-
-
-    if (this.user.salesCount) {
-      userCorrelative = this.user.salesCount + 1
-    }
-
     let photos = [...this.photos.data.map(el => this.dbs.uploadPhotoVoucher(saleRef.id, el))]
 
     forkJoin(photos).pipe(
