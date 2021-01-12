@@ -359,6 +359,7 @@ export class SalesDetailComponent implements OnInit {
               //If we are editting it (deshacer), and we are returning from
               //confirmedDocument to confirmedRequest, we should refill the 
               //lost stock
+              /*
               if (newStatus == this.saleStatusOptions.attended) {
                 if (edit) {
                   this.dbs.saveRealStock(this.sale.requestedProducts, false).then((res) => {
@@ -374,23 +375,19 @@ export class SalesDetailComponent implements OnInit {
                   })
                 }
 
-              }
+              }*/
 
               //venta anulada
               if (newStatus == this.saleStatusOptions.cancelled) {
                 this.dbs.unsaveRealStock(this.sale.requestedProducts, this.sale.correlative, true).then((res) => {
-                  console.log('atendido-anulado');
-                  list = res
-                  save = true
+                  console.log('anulado');
                 })
               }
               //retornar de anulado
               if (this.sale.status == this.saleStatusOptions.cancelled) {
                 if (newStatus != this.saleStatusOptions.cancelled) {
                   this.dbs.unsaveRealStock(this.sale.requestedProducts, this.sale.correlative, false).then((res) => {
-                    console.log('atendido-anulado');
-                    list = res
-                    save = true
+                    console.log('retornar anulado');
                   })
                 }
               }
