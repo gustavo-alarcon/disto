@@ -472,7 +472,7 @@ export class PurchaseComponent implements OnInit {
 
     }).catch(() => {
       this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
-
+      this.loading.next(false)
 
     })
 
@@ -509,6 +509,10 @@ export class PurchaseComponent implements OnInit {
       this.router.navigate(["/main/products"], { fragment: this.dbs.productView });
       //this.dbs.view.next(1)
       this.loading.next(false)
+    }).catch(() => {
+      this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
+      this.loading.next(false)
+
     })
 
   }
@@ -638,10 +642,11 @@ export class PurchaseComponent implements OnInit {
 
       }).then(() => {
         this.saveStock(list, newSale.correlative)
-      }).catch(error => {
-        console.log(error);
+      }).catch(() => {
         this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
-      });
+        this.loading.next(false)
+  
+      })
     })
   }
 
