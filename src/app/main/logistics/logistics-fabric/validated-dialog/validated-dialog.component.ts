@@ -184,7 +184,7 @@ export class ValidatedDialogComponent implements OnInit {
 
             transaction.set(editStockRef, {
               id: editStockRef.id,
-              description: 'anulado en logistica, compra nº' + this.data.correlative,
+              description: 'compra en logistica, compra nº' + this.data.correlative,
               createdAt: new Date(),
               oldStock: prodDoc.data().realStock,
               newStock: newStock

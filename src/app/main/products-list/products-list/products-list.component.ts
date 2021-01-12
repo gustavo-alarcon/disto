@@ -21,6 +21,7 @@ import { Category } from 'src/app/core/models/category.model';
 import { User } from 'src/app/core/models/user.model';
 import { ProductTransferMermaComponent } from '../product-transfer-merma/product-transfer-merma.component';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { ViewChangeStockComponent } from '../view-change-stock/view-change-stock.component';
 
 
 @Component({
@@ -397,6 +398,16 @@ export class ProductsListComponent implements OnInit {
     const batch = this.af.firestore.batch()
     this.productsTableDataSource.filteredData.forEach((product,ind) => {
       const sfDocRef = this.af.firestore.collection(`/db/distoProductos/productsList`).doc(product.id);
+      const editStock = this.af.firestore.collection(`db/distoProductos/productsList/${product.id}/stockChange`).doc()
+      let changeVirtualStock = {
+        id: editStock.id,
+        description: 'Reinicio' ,
+        createdAt: new Date(),
+        oldStock: 0,
+        newStock: 0
+      }
+
+      batch.set(editStock, changeVirtualStock)
       batch.update(sfDocRef,{
         virtualStock: product.realStock
       })
@@ -406,5 +417,13 @@ export class ProductsListComponent implements OnInit {
       
     })
 
+  }
+
+  viewStock(product){
+    this.dialog.open(ViewChangeStockComponent,{
+      data:{
+        data:product
+      }
+    })
   }
 }

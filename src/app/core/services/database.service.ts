@@ -31,7 +31,7 @@ import { AngularFireAuth } from "@angular/fire/auth";
   providedIn: "root",
 })
 export class DatabaseService {
-  public version: string = "V1.1.61r";
+  public version: string = "V1.1.64r";
   public isOpen: boolean = false;
   public isAdmin: boolean = false;
   public messageSaw: number = 0;
@@ -64,6 +64,8 @@ export class DatabaseService {
 
   // public opening = new BehaviorSubject<Array<{ opening: string, closing: string }>>([]);
   public opening$: Observable<Array<{ opening: string; closing: string }>>;
+
+  public expressCustomer = false;
 
   constructor(
     private afs: AngularFirestore,
@@ -203,6 +205,16 @@ export class DatabaseService {
     return this.afs
       .collection<Product>(this.productsListRef, (ref) =>
         ref.orderBy("priority", "desc")
+      )
+      .valueChanges()
+      .pipe(shareReplay(1));
+  }
+
+  getProductsStockChanges(id): Observable<any[]> {
+    return this.afs
+      .collection(
+        this.productsListRef + `/${id}/stockChange`,
+        (ref) => ref.orderBy("createdAt", "desc")
       )
       .valueChanges()
       .pipe(shareReplay(1));

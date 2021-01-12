@@ -70,7 +70,10 @@ export class AuthService {
 
   public signIn(type: 'facebook' | 'google'): Promise<void | firebase.auth.UserCredential> {
     let provider = null;
-
+    console.log('Hola Google');
+        
+    this.dbs.expressCustomer = false;
+    
     switch (type) {
       case 'facebook':
         provider = facebookProvider;

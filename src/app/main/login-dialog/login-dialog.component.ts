@@ -24,7 +24,9 @@ export class LoginDialogComponent implements OnInit {
   register: boolean = false
 
   registerForm = new FormControl(false)
-  register$: Observable<boolean>
+  register$: Observable<boolean>;
+
+  formHidden = true;
 
   constructor(
     public auth: AuthService,
@@ -55,9 +57,14 @@ export class LoginDialogComponent implements OnInit {
 
   }
 
+  toggleRegister(): void {
+    this.formHidden = !this.formHidden;
+  }
+
   login(): void {
     this.auth.signInEmail(this.dataFormGroup.get('email').value, this.dataFormGroup.get('pass').value)
       .then(res => {
+        this.dbs.expressCustomer = false;
         this.snackbar.open('Hola!', 'Cerrar', {
           duration: 6000
         });
@@ -74,6 +81,7 @@ export class LoginDialogComponent implements OnInit {
   registerUser(): void {
     this.auth.signUp(this.dataFormGroup.value)
       .then(res => {
+        this.dbs.expressCustomer = false;
         this.snackbar.open('Bienvenid@!', 'Cerrar', {
           duration: 6000
         });
@@ -100,6 +108,14 @@ export class LoginDialogComponent implements OnInit {
       this.snackbar.open('Parece que hubo un error ...', 'Cerrar');
       console.log(error);
     });;
+  }
+
+  continueAsExpress(): void {
+    this.dbs.expressCustomer = true;
+    this.snackbar.open('Bienvenid@, puedes continuar tu compra como usuario sin registro. Recuerda que en este modo no podremos guardar tu información para una próxima compra', 'Aceptar', {
+      duration: 16000
+    });
+    this.dialogref.close(true);
   }
 
   passwordReset() {

@@ -250,6 +250,9 @@
                   <button class="w3-small" mat-menu-item (click)="onDeleteItem(raw)">
                     <mat-icon>delete</mat-icon> Borrar
                   </button>
+                  <!--button class="w3-small" mat-menu-item (click)="viewStock(raw)">
+                    <mat-icon>history</mat-icon> Historial Stock
+                  </button-->
                 </mat-menu>
 
                 <button mat-icon-button [matMenuTriggerFor]="rawMenu" [disabled]="user.seller || user.accountant">
