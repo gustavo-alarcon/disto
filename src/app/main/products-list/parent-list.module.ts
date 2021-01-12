@@ -40,6 +40,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ProductTransferMermaComponent } from './product-transfer-merma/product-transfer-merma.component';
 import { ProductMermaHistoryComponent } from './product-merma-history/product-merma-history.component';
 import { ProductsMermaListComponent } from './products-merma-list/products-merma-list.component';
+import { ViewChangeStockComponent } from './view-change-stock/view-change-stock.component';
 
 
 
@@ -58,7 +59,8 @@ import { ProductsMermaListComponent } from './products-merma-list/products-merma
     ProductTransferMermaComponent,
     ProductsListComponent,
     ProductMermaHistoryComponent,
-    ProductsMermaListComponent
+    ProductsMermaListComponent,
+    ViewChangeStockComponent
   ],
   imports: [
     CommonModule,
