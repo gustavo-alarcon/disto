@@ -98,7 +98,6 @@ export class LoginDialogComponent implements OnInit {
   signInProvider(type: 'facebook'|'google') {
     this.auth.signIn(type).then(res => {
       if(res){
-        this.dbs.expressCustomer = false;
         this.snackbar.open('¡Bienvenido!', 'Cerrar');
       } else {
         this.snackbar.open('Parece que hubo un error ...', 'Cerrar');
@@ -113,8 +112,8 @@ export class LoginDialogComponent implements OnInit {
 
   continueAsExpress(): void {
     this.dbs.expressCustomer = true;
-    this.snackbar.open('Bienvenid@!', 'Cerrar', {
-      duration: 6000
+    this.snackbar.open('Bienvenid@, puedes continuar tu compra como usuario anónimo. Recuerda que en este modo no podremos guardar tu información para una próxima compra', 'Aceptar', {
+      duration: 16000
     });
     this.dialogref.close(true);
   }
