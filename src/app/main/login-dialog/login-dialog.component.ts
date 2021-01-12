@@ -112,7 +112,7 @@ export class LoginDialogComponent implements OnInit {
 
   continueAsExpress(): void {
     this.dbs.expressCustomer = true;
-    this.snackbar.open('Bienvenid@, puedes continuar tu compra como usuario anónimo. Recuerda que en este modo no podremos guardar tu información para una próxima compra', 'Aceptar', {
+    this.snackbar.open('Bienvenid@, puedes continuar tu compra como usuario sin registro. Recuerda que en este modo no podremos guardar tu información para una próxima compra', 'Aceptar', {
       duration: 16000
     });
     this.dialogref.close(true);
