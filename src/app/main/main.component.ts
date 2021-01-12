@@ -21,7 +21,7 @@ export class MainComponent implements OnInit {
     public auth: AuthService,
     public themeService: ThemeService,
     private dialog: MatDialog,
-    private dbs: DatabaseService
+    public dbs: DatabaseService
   ) { }
 
   ngOnInit(): void {
