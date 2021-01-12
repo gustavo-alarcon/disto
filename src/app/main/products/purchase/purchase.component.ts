@@ -499,7 +499,7 @@ export class PurchaseComponent implements OnInit {
         data: {
           name: this.firstFormGroup.value['name'],
           number: corr,
-          email: this.user.email
+          email: this.dbs.expressCustomer ? this.firstFormGroup.value['email'] : this.user.email
         }
       })
 
@@ -537,7 +537,7 @@ export class PurchaseComponent implements OnInit {
 
     console.log(this.dbs.expressCustomer);
     if (!this.dbs.expressCustomer) this.user.email = this.firstFormGroup.value['email'];
-    console.log(this.user.email);
+    console.log(this.user?.email);
 
     let newSale: Sale = {
       id: saleRef.id,
