@@ -4,6 +4,20 @@
             <div style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
 
                 <div>
+                    <div class="user" *ngIf="dbs.expressCustomer">
+                        <div>
+                            <img class="user__image border--primary" src="../../assets/images/profile.png">
+                        </div>
+                        <div>
+                            <div class="user__name">
+                                Usuario
+                            </div>
+                            <div class="user__surname">
+                                Sin registro
+                            </div>
+                        </div>
+                    </div>
+
                     <div *ngIf="auth.user$ | async as user else iniciarSesion" class="user">
                         <div>
                             <img *ngIf="user.photoURL else defaultPicture" [src]="user.photoURL"
@@ -26,6 +40,7 @@
                             </div>
                         </ng-template>
                     </div>
+
                     <ng-template #iniciarSesion>
                         <div class="login w3-center">
                             <button mat-raised-button color="accent" (click)="login()">
@@ -126,11 +141,13 @@
                     <img src="../../assets/images/Disto_Logo.png" class="main__logoimage" alt="logo">
                 </a>
                 <span class="ms-fill"></span>
-                <a href="mailto:ventas@distoproductos.com?subject=Soporte%20Disto&body=💚 Hola cheese Lover ¿Cómo podemos ayudarte?" class="w3-margin-right">
+                <a href="mailto:ventas@distoproductos.com?subject=Soporte%20Disto&body=💚 Hola cheese Lover ¿Cómo podemos ayudarte?"
+                    class="w3-margin-right">
                     <button mat-raised-button color="accent" style="border: 2px solid green" class="w3-hide-small">
                         <mat-icon>support_agent</mat-icon> Necesitas ayuda?
                     </button>
-                    <button mat-raised-button color="accent" style="border: 2px solid green" class="w3-hide-large w3-hide-medium">
+                    <button mat-raised-button color="accent" style="border: 2px solid green"
+                        class="w3-hide-large w3-hide-medium">
                         <mat-icon>support_agent</mat-icon>
                     </button>
                 </a>
