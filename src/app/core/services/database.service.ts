@@ -31,7 +31,7 @@ import { AngularFireAuth } from "@angular/fire/auth";
   providedIn: "root",
 })
 export class DatabaseService {
-  public version: string = "V1.1.65r";
+  public version: string = "V1.1.66r";
   public isOpen: boolean = false;
   public isAdmin: boolean = false;
   public messageSaw: number = 0;
@@ -66,6 +66,8 @@ export class DatabaseService {
   public opening$: Observable<Array<{ opening: string; closing: string }>>;
 
   public expressCustomer = false;
+
+  public actualSale: any;
 
   constructor(
     private afs: AngularFirestore,
@@ -210,11 +212,11 @@ export class DatabaseService {
       .pipe(shareReplay(1));
   }
 
-  getProductsStockChanges(id): Observable<any[]> {
+  getProductsStockChanges(id: string, date: {begin: Date, end: Date}): Observable<any[]> {
     return this.afs
       .collection(
         this.productsListRef + `/${id}/stockChange`,
-        (ref) => ref.orderBy("createdAt", "desc")
+        (ref) => ref.where('createdAt', '>=', date.begin).where('createdAt', '<=', date.end).orderBy("createdAt", "desc")
       )
       .valueChanges()
       .pipe(shareReplay(1));
@@ -304,6 +306,7 @@ export class DatabaseService {
           id: editStock.id,
           description: 'Editar directamente producto',
           createdAt: new Date(),
+          createdBy: this.getUsersStatic(),
           oldStock: oldProduct.realStock,
           newStock: product.realStock
         })
@@ -1275,5 +1278,30 @@ export class DatabaseService {
           .where("requestedDate", ">=", date.begin)
       )
       .valueChanges();
+  }
+
+  savePurchaseError(user, error): void {
+    let ref = this.afs.firestore.collection(`db/distoProductos/salesErrorLog`).doc();
+    
+    let batch = this.afs.firestore.batch();
+    // removing user from object
+    delete this.actualSale.user;
+
+    let data = {
+      error: error,
+      sale: this.actualSale,
+      createdAt: new Date(),
+      createdBy: user ? user : null
+    }
+
+    console.log(data);
+    batch.set(ref, data)
+    batch.commit()
+      .then(() => {
+        console.log('Error registrado')
+      })
+      .catch(error => {
+        console.error('SavePurchaseError')
+      })
   }
 }

@@ -467,6 +467,8 @@ export class PurchaseComponent implements OnInit {
       })
       return Promise.all(promises);
     }).then(res => {
+      console.log(res);
+
       this.savePurchase(res)
 
 
@@ -481,39 +483,44 @@ export class PurchaseComponent implements OnInit {
 
   saveStock(list, corr) {
     const batch = this.af.firestore.batch()
-    list.forEach(lt => {
-      const editStock = this.af.firestore.collection(`db/distoProductos/productsList/${lt.product}/stockChange`).doc()
-      let changeVirtualStock = {
-        id: editStock.id,
-        description: 'Compra App, venta nº ' + corr,
-        createdAt: new Date(),
-        oldStock: lt.oldStock,
-        newStock: lt.newStock
-      }
 
-      batch.set(editStock, changeVirtualStock)
-    })
-
-    batch.commit().then(() => {
-      this.dialog.open(SaleDialogComponent, {
-        data: {
-          name: this.firstFormGroup.value['name'],
-          number: corr,
-          email: this.dbs.expressCustomer ? this.firstFormGroup.value['email'] : this.user.email
+    try {
+      list.forEach(lt => {
+        const editStock = this.af.firestore.collection(`db/distoProductos/productsList/${lt.product}/stockChange`).doc()
+        let changeVirtualStock = {
+          id: editStock.id,
+          description: 'Compra App, venta nº ' + corr,
+          createdAt: new Date(),
+          createdBy: this.dbs.expressCustomer ?
+            this.firstFormGroup.value['name'] + ' ' + this.firstFormGroup.value['lastname1'] :
+            this.user.name + ' ' + this.user.lastName1,
+          oldStock: lt.oldStock,
+          newStock: lt.newStock
         }
+
+        batch.set(editStock, changeVirtualStock)
+
+        batch.commit().then(() => {
+          this.dialog.open(SaleDialogComponent, {
+            data: {
+              name: this.firstFormGroup.value['name'],
+              number: corr,
+              email: this.dbs.expressCustomer ? this.firstFormGroup.value['email'] : this.user.email
+            }
+          })
+
+          this.dbs.order = []
+          this.dbs.orderObs.next([])
+          this.dbs.total = 0
+          this.router.navigate(["/main/products"], { fragment: this.dbs.productView });
+          //this.dbs.view.next(1)
+          this.loading.next(false)
+        })
       })
-
-      this.dbs.order = []
-      this.dbs.orderObs.next([])
-      this.dbs.total = 0
-      this.router.navigate(["/main/products"], { fragment: this.dbs.productView });
-      //this.dbs.view.next(1)
-      this.loading.next(false)
-    }).catch(() => {
-      this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
-      this.loading.next(false)
-
-    })
+    } catch (error) {
+      this.dbs.savePurchaseError(this.dbs.expressCustomer ? { completeName: this.firstFormGroup.value['name'] + ' ' + this.firstFormGroup.value['lastname1'] } : this.user, 'Catch saveStock' +error);
+      console.log(error);
+    }
 
   }
 
@@ -539,9 +546,7 @@ export class PurchaseComponent implements OnInit {
 
     let expressUser = { ...customObject };
 
-    console.log(this.dbs.expressCustomer);
     if (!this.dbs.expressCustomer) this.user.email = this.firstFormGroup.value['email'];
-    console.log(this.user?.email);
 
     let newSale: Sale = {
       id: saleRef.id,
@@ -589,60 +594,71 @@ export class PurchaseComponent implements OnInit {
       })]
 
       return this.af.firestore.runTransaction((transaction) => {
-        return transaction.get(saleCount).then((sfDoc) => {
-          if (!sfDoc.exists) {
-            transaction.set(saleCount, { salesRCounter: 0 });
-          }
+        try {
+          return transaction.get(saleCount).then((sfDoc) => {
 
-          //sales
-          ////generalCounter
-          let newCorr = 1
-          if (sfDoc.data().salesRCounter) {
-            newCorr = sfDoc.data().salesRCounter + 1;
-          }
+            if (!sfDoc.exists) {
+              transaction.set(saleCount, { salesRCounter: 0 });
+            }
 
-          transaction.update(saleCount, { salesRCounter: newCorr });
 
-          newSale.correlative = newCorr
-          transaction.set(saleRef, newSale);
+            //sales
+            ////generalCounter
+            let newCorr = 1
+            if (sfDoc.data().salesRCounter) {
+              newCorr = sfDoc.data().salesRCounter + 1;
+            }
 
-          // Expreess customer
-          if (!this.dbs.expressCustomer) {
-            const email = {
-              to: this.user.email,
-              template: {
-                name: 'saleEmail'
+            transaction.update(saleCount, { salesRCounter: newCorr });
+
+            newSale.correlative = newCorr
+
+            // Passing global values for error catching
+            this.dbs.actualSale = newSale
+
+            transaction.set(saleRef, newSale);
+
+            // Expreess customer
+            if (!this.dbs.expressCustomer) {
+              const email = {
+                to: this.user.email,
+                template: {
+                  name: 'saleEmail'
+                }
               }
+              const emailRef = this.af.firestore.collection(`/mail`).doc();
+
+              let userCorrelative = 1
+              const ref = this.af.firestore.collection(`/users`).doc(this.user.uid);
+
+
+              if (this.user.salesCount) {
+                userCorrelative = this.user.salesCount + 1
+              }
+
+              //email
+              transaction.set(emailRef, email)
+              //user
+              transaction.update(ref, {
+                contact: newSale.location,
+                name: this.firstFormGroup.value['name'],
+                lastName1: this.firstFormGroup.value['lastname1'],
+                lastName2: this.firstFormGroup.value['lastname2'],
+                dni: this.firstFormGroup.value['dni'],
+                salesCount: userCorrelative
+              })
             }
-            const emailRef = this.af.firestore.collection(`/mail`).doc();
-
-            let userCorrelative = 1
-            const ref = this.af.firestore.collection(`/users`).doc(this.user.uid);
-
-
-            if (this.user.salesCount) {
-              userCorrelative = this.user.salesCount + 1
-            }
-
-            //email
-            transaction.set(emailRef, email)
-            //user
-            transaction.update(ref, {
-              contact: newSale.location,
-              name: this.firstFormGroup.value['name'],
-              lastName1: this.firstFormGroup.value['lastname1'],
-              lastName2: this.firstFormGroup.value['lastname2'],
-              dni: this.firstFormGroup.value['dni'],
-              salesCount: userCorrelative
-            })
-          }
-
-
-        });
+          })
+        } catch (error) {
+          console.log(error);
+          this.dbs.savePurchaseError(this.dbs.expressCustomer ? expressUser : this.user, 'Catch Get Transaction' + error)
+        }
 
       }).then(() => {
         this.saveStock(list, newSale.correlative)
-      }).catch(() => {
+      }).catch(error => {
+        console.log(error);
+        this.dbs.savePurchaseError(this.dbs.expressCustomer ? expressUser : this.user, 'Catch Transaction' + error);
         this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
         this.loading.next(false)
   

@@ -2,12 +2,13 @@ import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { DatabaseService } from 'src/app/core/services/database.service';
 import { Product } from 'src/app/core/models/product.model';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { startWith, switchMap, tap } from 'rxjs/operators';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import * as XLSX from 'xlsx';
 import { DatePipe } from '@angular/common';
+import { FormControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-view-change-stock',
@@ -19,14 +20,15 @@ export class ViewChangeStockComponent implements OnInit {
   loadingHistory = new BehaviorSubject<boolean>(false);
   loadingHistory$ = this.loadingHistory.asObservable();
 
-  displayedColumns: string[] = ['index', 'date', 'status', 'oldStock', 'newStock'];
+  displayedColumns: string[] = ['index', 'date', 'status', 'oldStock', 'newStock', 'createdBy'];
   dataSource = new MatTableDataSource();
   @ViewChild(MatPaginator, { static: false }) set content(paginator1: MatPaginator) {
     this.dataSource.paginator = paginator1;
   }
 
 
-  init$: Observable<any>
+  init$: Observable<any>;
+  date: FormControl;
 
   constructor(
     private dialogRef: MatDialogRef<ViewChangeStockComponent>,
@@ -36,13 +38,30 @@ export class ViewChangeStockComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.init$ = this.dbs.getProductsStockChanges(this.data.data.id).pipe(
-      tap((res) => {
-        console.log(res);
-        this.dataSource.data = res
-        this.loadingHistory.next(false)
-      })
-    )
+    this.date = new FormControl({
+      begin: new Date(),
+      end: new Date()
+    });
+
+    this.init$ =
+      this.date.valueChanges
+        .pipe(
+          startWith({ begin: new Date(), end: new Date() }),
+          switchMap(date => {
+            date['begin'].setHours(0, 0, 0);
+            date['end'].setHours(23, 59, 59);
+            console.log(date);
+            
+            return this.dbs.getProductsStockChanges(this.data.data.id, date)
+              .pipe(
+                tap((res) => {
+                  console.log(res);
+                  this.dataSource.data = res
+                  this.loadingHistory.next(false)
+                })
+              )
+          })
+        )
   }
 
   downloadXls(): void {
