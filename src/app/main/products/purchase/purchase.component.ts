@@ -467,6 +467,8 @@ export class PurchaseComponent implements OnInit {
       })
       return Promise.all(promises);
     }).then(res => {
+      console.log(res);
+      
       this.savePurchase(res)
 
 
@@ -487,6 +489,9 @@ export class PurchaseComponent implements OnInit {
         id: editStock.id,
         description: 'Compra App, venta nº ' + corr,
         createdAt: new Date(),
+        createdBy: this.dbs.expressCustomer ? 
+          this.firstFormGroup.value['name'] + ' ' + this.firstFormGroup.value['lastname1'] : 
+          this.user.name + ' ' + this.user.lastName1,
         oldStock: lt.oldStock,
         newStock: lt.newStock
       }
@@ -535,9 +540,7 @@ export class PurchaseComponent implements OnInit {
 
     let expressUser = { ...customObject };
 
-    console.log(this.dbs.expressCustomer);
     if (!this.dbs.expressCustomer) this.user.email = this.firstFormGroup.value['email'];
-    console.log(this.user?.email);
 
     let newSale: Sale = {
       id: saleRef.id,
@@ -586,10 +589,12 @@ export class PurchaseComponent implements OnInit {
 
       return this.af.firestore.runTransaction((transaction) => {
         return transaction.get(saleCount).then((sfDoc) => {
+          /*
           if (!sfDoc.exists) {
             transaction.set(saleCount, { salesRCounter: 0 });
           }
 
+          
           //sales
           ////generalCounter
           let newCorr = 1
@@ -633,7 +638,7 @@ export class PurchaseComponent implements OnInit {
             })
           }
 
-
+          */
         });
 
       }).then(() => {
