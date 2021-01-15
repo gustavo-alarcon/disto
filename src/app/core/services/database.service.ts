@@ -67,6 +67,8 @@ export class DatabaseService {
 
   public expressCustomer = false;
 
+  public actualSale: any;
+
   constructor(
     private afs: AngularFirestore,
     private storage: AngularFireStorage,
@@ -1275,5 +1277,30 @@ export class DatabaseService {
           .where("requestedDate", ">=", date.begin)
       )
       .valueChanges();
+  }
+
+  savePurchaseError(user, error): void {
+    let ref = this.afs.firestore.collection(`db/distoProductos/salesErrorLog`).doc();
+    
+    let batch = this.afs.firestore.batch();
+    // removing user from object
+    delete this.actualSale.user;
+
+    let data = {
+      error: error.message,
+      sale: this.actualSale,
+      createdAt: new Date(),
+      createdBy: user ? user : null
+    }
+
+    console.log(data);
+    batch.set(ref, data)
+    batch.commit()
+      .then(() => {
+        console.log('Error registrado')
+      })
+      .catch(error => {
+        console.error('SavePurchaseError')
+      })
   }
 }
