@@ -31,7 +31,7 @@ import { AngularFireAuth } from "@angular/fire/auth";
   providedIn: "root",
 })
 export class DatabaseService {
-  public version: string = "V1.1.65r";
+  public version: string = "V1.1.66r";
   public isOpen: boolean = false;
   public isAdmin: boolean = false;
   public messageSaw: number = 0;
@@ -306,6 +306,7 @@ export class DatabaseService {
           id: editStock.id,
           description: 'Editar directamente producto',
           createdAt: new Date(),
+          createdBy: this.getUsersStatic(),
           oldStock: oldProduct.realStock,
           newStock: product.realStock
         })
@@ -1287,7 +1288,7 @@ export class DatabaseService {
     delete this.actualSale.user;
 
     let data = {
-      error: error.message,
+      error: error,
       sale: this.actualSale,
       createdAt: new Date(),
       createdBy: user ? user : null

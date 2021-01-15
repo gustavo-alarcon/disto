@@ -518,7 +518,7 @@ export class PurchaseComponent implements OnInit {
         })
       })
     } catch (error) {
-      this.dbs.savePurchaseError(this.dbs.expressCustomer ? { completeName: this.firstFormGroup.value['name'] + ' ' + this.firstFormGroup.value['lastname1'] } : this.user, error);
+      this.dbs.savePurchaseError(this.dbs.expressCustomer ? { completeName: this.firstFormGroup.value['name'] + ' ' + this.firstFormGroup.value['lastname1'] } : this.user, 'Catch saveStock' +error);
       console.log(error);
     }
 
@@ -651,14 +651,14 @@ export class PurchaseComponent implements OnInit {
           })
         } catch (error) {
           console.log(error);
-          this.dbs.savePurchaseError(this.dbs.expressCustomer ? expressUser : this.user, error)
+          this.dbs.savePurchaseError(this.dbs.expressCustomer ? expressUser : this.user, 'Catch Get Transaction' + error)
         }
 
       }).then(() => {
         this.saveStock(list, newSale.correlative)
       }).catch(error => {
         console.log(error);
-        this.dbs.savePurchaseError(this.dbs.expressCustomer ? expressUser : this.user, error);
+        this.dbs.savePurchaseError(this.dbs.expressCustomer ? expressUser : this.user, 'Catch Transaction' + error);
         this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
       });
     })
