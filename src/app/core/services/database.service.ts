@@ -210,11 +210,11 @@ export class DatabaseService {
       .pipe(shareReplay(1));
   }
 
-  getProductsStockChanges(id): Observable<any[]> {
+  getProductsStockChanges(id: string, date: {begin: Date, end: Date}): Observable<any[]> {
     return this.afs
       .collection(
         this.productsListRef + `/${id}/stockChange`,
-        (ref) => ref.orderBy("createdAt", "desc")
+        (ref) => ref.where('createdAt', '>=', date.begin).where('createdAt', '<=', date.end).orderBy("createdAt", "desc")
       )
       .valueChanges()
       .pipe(shareReplay(1));

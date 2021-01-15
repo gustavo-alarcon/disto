@@ -178,7 +178,7 @@
               {{raw.mermaStock}}
             </td>
           </ng-container>
-          
+
           <ng-container matColumnDef="sellMinimum">
             <th *matHeaderCellDef style=" font-size: 0.9em;padding:0px 1em; font-weight: 500; color: #828282; "
               class="w3-center w3-padding  ">
@@ -228,13 +228,15 @@
                     </button>
                   </ng-template>
                   <div [matTooltipDisabled]="categorySelected" matTooltip="Primero seleccione una categoría">
-                    <button class="w3-small" mat-menu-item (click)="increasePriority(raw)" [disabled]="!categorySelected">
+                    <button class="w3-small" mat-menu-item (click)="increasePriority(raw)"
+                      [disabled]="!categorySelected">
                       <mat-icon>add</mat-icon> Prioridad
                     </button>
                   </div>
                   <div [matTooltipDisabled]="categorySelected" matTooltip="Primero seleccione una categoría">
-                    <button class="w3-small" mat-menu-item (click)="decreasePriority(raw)" [disabled]="!categorySelected"
-                      [matTooltipDisabled]="categorySelected" matTooltip="Primero seleccione una categoría">
+                    <button class="w3-small" mat-menu-item (click)="decreasePriority(raw)"
+                      [disabled]="!categorySelected" [matTooltipDisabled]="categorySelected"
+                      matTooltip="Primero seleccione una categoría">
                       <mat-icon>remove</mat-icon> Prioridad
                     </button>
                   </div>
@@ -250,9 +252,9 @@
                   <button class="w3-small" mat-menu-item (click)="onDeleteItem(raw)">
                     <mat-icon>delete</mat-icon> Borrar
                   </button>
-                  <!--button class="w3-small" mat-menu-item (click)="viewStock(raw)">
+                  <button class="w3-small" mat-menu-item (click)="viewStock(raw)">
                     <mat-icon>history</mat-icon> Historial Stock
-                  </button-->
+                  </button>
                 </mat-menu>
 
                 <button mat-icon-button [matMenuTriggerFor]="rawMenu" [disabled]="user.seller || user.accountant">
