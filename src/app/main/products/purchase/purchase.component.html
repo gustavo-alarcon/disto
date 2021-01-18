@@ -252,6 +252,14 @@
                           style="width: 100%">*comprimiendo</span>
                         <input style="display: none" #photoURL type="file" accept="image/*"
                           (change)="addNewPhoto('photoURL', photoURL.files)" />
+
+                        <!-- <a href="mailto:ventas@distoproductos.com?subject=Voucher {{firstFormGroup.value['email']}}&body=💚 Hola {{firstFormGroup.value['name']}} {{firstFormGroup.value['lastname1']}}, adjunta la foto de tu voucher de pago"
+                          class="w3-margin-right">
+                          <button mat-raised-button color="accent" style="border: 2px solid green"
+                            class="w3-hide-small w3-small">
+                            <mat-icon>receipt</mat-icon> Si no puedes adjuntar la foto, intenta enviarla por correo
+                          </button>
+                        </a> -->
                       </div>
                     </form>
                     <div class="ms-flex">
@@ -262,8 +270,7 @@
                       <span class="ms-fill"></span>
                     </div>
                     <button mat-raised-button color="accent" type="submit" (click)="prueba()"
-                      class="w3-block w3-margin-top" style="font-weight: bold"
-                      [disabled]="dbs.order.length==0">
+                      class="w3-block w3-margin-top" style="font-weight: bold" [disabled]="dbs.order.length==0">
                       Finalizar Compra
                     </button>
                   </div>
