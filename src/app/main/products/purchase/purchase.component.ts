@@ -453,6 +453,7 @@ export class PurchaseComponent implements OnInit {
 
         }).catch((error) => {
           console.log("Transaction failed: ", error);
+          this.dbs.savePurchaseError(this.dbs.expressCustomer ? this.firstFormGroup.value['name'] + ' ' + this.firstFormGroup.value['lastname1'] : this.user, 'Catch Promised Transaction (Save): ' + error);
           return {
             isSave: false,
             product: order.product.id,
@@ -468,11 +469,9 @@ export class PurchaseComponent implements OnInit {
       return Promise.all(promises);
     }).then(res => {
       console.log(res);
-
       this.savePurchase(res)
-
-
-    }).catch(() => {
+    }).catch(error => {
+      this.dbs.savePurchaseError(this.dbs.expressCustomer ? this.firstFormGroup.value['name'] + ' ' + this.firstFormGroup.value['lastname1'] : this.user, 'Catch Transaction (Save): ' + error);
       this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
 
 
@@ -518,7 +517,7 @@ export class PurchaseComponent implements OnInit {
         this.loading.next(false)
       })
     } catch (error) {
-      this.dbs.savePurchaseError(this.dbs.expressCustomer ? { completeName: this.firstFormGroup.value['name'] + ' ' + this.firstFormGroup.value['lastname1'] } : this.user, 'Catch saveStock' +error);
+      this.dbs.savePurchaseError(this.dbs.expressCustomer ? { completeName: this.firstFormGroup.value['name'] + ' ' + this.firstFormGroup.value['lastname1'] } : this.user, 'Catch (saveStock): ' +error);
       console.log(error);
     }
 
@@ -651,14 +650,14 @@ export class PurchaseComponent implements OnInit {
           })
         } catch (error) {
           console.log(error);
-          this.dbs.savePurchaseError(this.dbs.expressCustomer ? expressUser : this.user, 'Catch Get Transaction' + error)
+          this.dbs.savePurchaseError(this.dbs.expressCustomer ? expressUser : this.user, 'Catch Get Transaction (SavePurchase): ' + error)
         }
 
       }).then(() => {
         this.saveStock(list, newSale.correlative)
       }).catch(error => {
         console.log(error);
-        this.dbs.savePurchaseError(this.dbs.expressCustomer ? expressUser : this.user, 'Catch Transaction' + error);
+        this.dbs.savePurchaseError(this.dbs.expressCustomer ? expressUser : this.user, 'Catch Transaction (SAvePurchase): ' + error);
         this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
       });
     })
