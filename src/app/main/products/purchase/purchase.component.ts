@@ -499,23 +499,23 @@ export class PurchaseComponent implements OnInit {
         }
 
         batch.set(editStock, changeVirtualStock)
+      })
 
-        batch.commit().then(() => {
-          this.dialog.open(SaleDialogComponent, {
-            data: {
-              name: this.firstFormGroup.value['name'],
-              number: corr,
-              email: this.dbs.expressCustomer ? this.firstFormGroup.value['email'] : this.user.email
-            }
-          })
-
-          this.dbs.order = []
-          this.dbs.orderObs.next([])
-          this.dbs.total = 0
-          this.router.navigate(["/main/products"], { fragment: this.dbs.productView });
-          //this.dbs.view.next(1)
-          this.loading.next(false)
+      batch.commit().then(() => {
+        this.dialog.open(SaleDialogComponent, {
+          data: {
+            name: this.firstFormGroup.value['name'],
+            number: corr,
+            email: this.dbs.expressCustomer ? this.firstFormGroup.value['email'] : this.user.email
+          }
         })
+
+        this.dbs.order = []
+        this.dbs.orderObs.next([])
+        this.dbs.total = 0
+        this.router.navigate(["/main/products"], { fragment: this.dbs.productView });
+        //this.dbs.view.next(1)
+        this.loading.next(false)
       })
     } catch (error) {
       this.dbs.savePurchaseError(this.dbs.expressCustomer ? { completeName: this.firstFormGroup.value['name'] + ' ' + this.firstFormGroup.value['lastname1'] } : this.user, 'Catch saveStock' +error);
