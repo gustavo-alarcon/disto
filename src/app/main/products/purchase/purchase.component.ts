@@ -473,7 +473,7 @@ export class PurchaseComponent implements OnInit {
     }).catch(error => {
       this.dbs.savePurchaseError(this.dbs.expressCustomer ? this.firstFormGroup.value['name'] + ' ' + this.firstFormGroup.value['lastname1'] : this.user, 'Catch Transaction (Save): ' + error);
       this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
-
+      this.loading.next(false)
 
     })
 
@@ -659,7 +659,9 @@ export class PurchaseComponent implements OnInit {
         console.log(error);
         this.dbs.savePurchaseError(this.dbs.expressCustomer ? expressUser : this.user, 'Catch Transaction (SAvePurchase): ' + error);
         this.snackbar.open('Error de conexión, no se completo la compra, intentelo de nuevo', 'cerrar')
-      });
+        this.loading.next(false)
+  
+      })
     })
   }
 

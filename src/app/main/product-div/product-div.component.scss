@@ -5,11 +5,11 @@
     border: 1px solid #f0f0f0;
     width: 100%;
 
-    &--package{
+    &--package {
         max-height: 450px;
     }
 
-    &--product{
+    &--product {
         height: 230px;
     }
 
@@ -35,10 +35,10 @@
         margin-bottom: 0.2em;
         font-size: 0.7em;
         word-break: break-word;
-        &--prod{
+        &--prod {
             min-height: 60px;
         }
-        &--pack{
+        &--pack {
             min-height: 30px;
         }
     }
@@ -51,7 +51,7 @@
         font-size: 1em;
         font-weight: bold;
         word-break: break-word;
-        &--prod{
+        &--prod {
             width: 70%;
         }
     }
@@ -102,7 +102,7 @@
         font-weight: bold;
     }
 
-    &__choose{
+    &__choose {
         padding: 0 10px;
         margin-top: 5px;
         min-height: 100px;
@@ -125,5 +125,19 @@
         width: fit-content;
         border-radius: 10px;
         font-size: 0.8em;
+    }
+}
+
+@media (max-width: 450px) {
+    .product {
+        &__paragraph {
+            overflow: hidden;
+            &--prod {
+                height: 60px;
+            }
+            &--pack {
+                height: 30px;
+            }
+        }
     }
 }
