@@ -257,7 +257,7 @@ export class PurchaseComponent implements OnInit {
           phone: [null, [Validators.required, Validators.minLength(6)]],
         });
 
-        this.firstFormGroup.get('email').disable()
+        // this.firstFormGroup.get('email').disable()
 
       }
     }

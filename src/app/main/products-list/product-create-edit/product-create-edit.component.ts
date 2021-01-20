@@ -233,7 +233,7 @@ export class ProductCreateEditComponent implements OnInit {
       editedBy: this.data.edit ? user : null,
     }
     
-    this.dbs.createEditProduct(this.data.edit, product, this.data.data, this.photos.data.photoURL)
+    this.dbs.createEditProduct(this.data.edit, product, user, this.data.data, this.photos.data.photoURL)
       .subscribe(batch => {
         batch.commit().then(res => {
           this.dialogRef.close(true);

@@ -26,6 +26,7 @@ import { Buy, BuyRequestedProduct } from "../models/buy.model";
 import * as firebase from "firebase";
 import { Package } from "../models/package.model";
 import { AngularFireAuth } from "@angular/fire/auth";
+import { AuthService } from "./auth.service";
 
 @Injectable({
   providedIn: "root",
@@ -212,7 +213,7 @@ export class DatabaseService {
       .pipe(shareReplay(1));
   }
 
-  getProductsStockChanges(id: string, date: {begin: Date, end: Date}): Observable<any[]> {
+  getProductsStockChanges(id: string, date: { begin: Date, end: Date }): Observable<any[]> {
     return this.afs
       .collection(
         this.productsListRef + `/${id}/stockChange`,
@@ -281,8 +282,9 @@ export class DatabaseService {
   createEditProduct(
     edit: boolean,
     product: Product,
+    user: User,
     oldProduct?: Product,
-    photo?: File
+    photo?: File,
   ): Observable<firebase.firestore.WriteBatch> {
     let productRef: DocumentReference;
     let productData: Product;
@@ -302,14 +304,17 @@ export class DatabaseService {
       if (changeStock) {
         editStock = this.afs.firestore
           .collection(`db/distoProductos/productsList/${oldProduct.id}/stockChange`).doc()
-        batch.set(editStock, {
+
+        let setData = {
           id: editStock.id,
           description: 'Editar directamente producto',
           createdAt: new Date(),
-          createdBy: this.getUsersStatic(),
+          createdBy: user,
           oldStock: oldProduct.realStock,
           newStock: product.realStock
-        })
+        };
+        
+        batch.set(editStock, setData)
       }
     }
     //creating
@@ -1238,17 +1243,17 @@ export class DatabaseService {
             .get(sfDocRef)
             .then((prodDoc) => {
               let newStock
-              if(sum){
+              if (sum) {
                 newStock = prodDoc.data().realStock + order.reduce;
-              }else{
+              } else {
                 newStock = prodDoc.data().realStock - order.reduce;
               }
-              
-              
+
+
               transaction.update(sfDocRef, { realStock: newStock });
               transaction.set(editStock, {
                 id: editStock.id,
-                description: sum?'anular venta nº ' + correlative:'deshacer anulación venta nº ' + correlative,
+                description: sum ? 'anular venta nº ' + correlative : 'deshacer anulación venta nº ' + correlative,
                 createdAt: new Date(),
                 oldStock: prodDoc.data().realStock,
                 newStock: newStock
@@ -1282,7 +1287,7 @@ export class DatabaseService {
 
   savePurchaseError(user, error): void {
     let ref = this.afs.firestore.collection(`db/distoProductos/salesErrorLog`).doc();
-    
+
     let batch = this.afs.firestore.batch();
     // removing user from object
     delete this.actualSale.user;
