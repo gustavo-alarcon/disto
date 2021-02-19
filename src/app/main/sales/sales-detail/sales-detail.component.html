@@ -24,7 +24,7 @@
             </button>
         </span>
     </div>
-    <div *ngIf="products$ | async as products" class="actionsContainer formFieldRounded">
+    <div *ngIf="products$ | async as products" class="actionsContainer formFieldRounded w3-margin-top">
         <mat-form-field *ngIf="sale.status == saleStatusOptions.attended" class="content w3-small"
             style="display: block; width:100%; margin-bottom: 0;" appearance="outline">
             <mat-icon matPrefix></mat-icon>
@@ -41,19 +41,17 @@
             </mat-error>
         </mat-form-field>
     </div>
-    <div class="w3-margin-top">
-        <table [formGroup]="productForm" class="table-sale">
-            <tr>
-                <th class="quantity">Cant.</th>
-                <th>Descripción</th>
-                <th>Precio</th>
-            </tr>
-            <tr formArrayName="productList"
-                *ngFor="let item of productForm.get('productList')['controls']; let i = index">
+    <div [formGroup]="productForm">
 
-                <div [formGroupName]="i" style="display:contents">
-                    <!-- Quantity -->
-                    <td class="table-sale__td table-sale__td--space" style="overflow: auto;">
+        <div class="details__row">
+            <div class="details__row--quantity details__header">Cant.</div>
+            <div class="details__row--description details__header">Descripción</div>
+            <div class="details__row--price details__header">Precio</div>
+        </div>
+        <div formArrayName="productList" *ngFor="let item of productForm.get('productList')['controls']; let i = index">
+            <div class="details__row details__row--bottom" [formGroupName]="i">
+                <div class="details__row--quantity">
+                    <div style="overflow: auto;">
                         <input *ngIf="sale.status == saleStatusOptions.attended else readQuantity" autocomplete="off"
                             class="table-sale__input--thin" formControlName="quantity" type="number" max=99 min=0
                             required>
@@ -61,154 +59,133 @@
                             {{item.get('quantity').value}}
                         </ng-template>
                         ({{item.get('product').value['unit']['abbreviation']}})
-                    </td>
-                    <!-- Description -->
-                    <td class="table-sale__td table-sale__td--space" style="overflow: auto;">
-
-                        <!-- Normal -->
-                        <span *ngIf="!item.get('product').value.promo">
-                            {{item.get('product').value.description}}
-                            <mat-icon style="cursor: pointer; font-size:medium; width:auto"
-                                matTooltip="{{item.get('product').value.price | currency: 'S/. '}} por {{item.get('product').value.unit.abbreviation}}">
-                                info
-                            </mat-icon>
-                        </span>
-                        <!-- We have promo-->
-                        <span *ngIf="item.get('product').value.promo">
-                            {{item.get('product').value.description}}
-                            <mat-icon style="cursor: pointer; font-size:medium; width:auto"
-                                matTooltip="Precio: {{item.get('product').value.price | currency: 'S/. '}} por {{item.get('product').value.unit.abbreviation}}">
-                                info
-                            </mat-icon>
-                            <mat-icon style="cursor: pointer; font-size:medium; width:auto" matTooltip="Oferta ({{onFloor(item.get('quantity').value, item.get('product').value.promoData.quantity)}}): 
+                    </div>
+                </div>
+                <div class="details__row--description">
+                    <!-- Normal -->
+                    <span *ngIf="!item.get('product').value.promo">
+                        {{item.get('product').value.description}}
+                        <mat-icon style="cursor: pointer; font-size:medium; width:auto"
+                            matTooltip="{{item.get('product').value.price | currency: 'S/. '}} por {{item.get('product').value.unit.abbreviation}}">
+                            info
+                        </mat-icon>
+                    </span>
+                    <!-- We have promo-->
+                    <span *ngIf="item.get('product').value.promo">
+                        {{item.get('product').value.description}}
+                        <mat-icon style="cursor: pointer; font-size:medium; width:auto"
+                            matTooltip="Precio: {{item.get('product').value.price | currency: 'S/. '}} por {{item.get('product').value.unit.abbreviation}}">
+                            info
+                        </mat-icon>
+                        <mat-icon style="cursor: pointer; font-size:medium; width:auto" matTooltip="Oferta ({{onFloor(item.get('quantity').value, item.get('product').value.promoData.quantity)}}): 
                                 {{item.get('product').value.promoData.quantity}} {{(item.get('product').value.unit.abbreviation)}}
                                 X
                                 {{item.get('product').value.promoData.promoPrice | currency: 'S/. '}}">
-                                new_releases
-                            </mat-icon>
-                        </span>
+                            new_releases
+                        </mat-icon>
+                    </span>
 
-                        <!-- only for packages -->
-                        <ng-container *ngIf="item.get('product').value.package">
-                            <br>
-                            <ul style="margin: 0; padding-left: 14px;">
-                                <li *ngFor="let packageItems of item.get('product').value.items; let i2=index">
-                                    <ng-container *ngIf="(packageItems.productsOptions.length == 1
+                    <!-- only for packages -->
+                    <ng-container *ngIf="item.get('product').value.package">
+                        <br>
+                        <ul style="margin: 0; padding-left: 14px;">
+                            <li *ngFor="let packageItems of item.get('product').value.items; let i2=index">
+                                <ng-container *ngIf="(packageItems.productsOptions.length == 1
                                             || sale.status != saleStatusOptions.attended) else noSingle">
 
-                                        <!-- First case... only one option -->
-                                        <ng-container *ngIf="packageItems.productsOptions.length == 1">
-                                            {{packageItems.productsOptions[0].description | titlecase}}
-                                            <mat-icon style="cursor: pointer; font-size:medium; width:auto"
-                                                matTooltip="{{packageItems.productsOptions[0].unit.abbreviation}}">
-                                                info
-                                            </mat-icon>
-                                        </ng-container>
-
-                                        <!-- Second case... saleStatus is not attended -->
-                                        <ng-container *ngIf="packageItems.productsOptions.length != 1 &&
-                                            sale.status != saleStatusOptions.attended">
-                                            {{item.get('chosenOptions')['controls'][i2].value.description | titlecase}}
-                                            <mat-icon style="cursor: pointer; font-size:medium; width:auto"
-                                                matTooltip="{{item.get('chosenOptions')['controls'][i2].value.unit.abbreviation}}">
-                                                info
-                                            </mat-icon>
-                                        </ng-container>
-
+                                    <!-- First case... only one option -->
+                                    <ng-container *ngIf="packageItems.productsOptions.length == 1">
+                                        {{packageItems.productsOptions[0].description | titlecase}}
+                                        <mat-icon style="cursor: pointer; font-size:medium; width:auto"
+                                            matTooltip="{{packageItems.productsOptions[0].unit.abbreviation}}">
+                                            info
+                                        </mat-icon>
                                     </ng-container>
 
+                                    <!-- Second case... saleStatus is not attended -->
+                                    <ng-container *ngIf="packageItems.productsOptions.length != 1 &&
+                                            sale.status != saleStatusOptions.attended">
+                                        {{item.get('chosenOptions')['controls'][i2].value.description | titlecase}}
+                                        <mat-icon style="cursor: pointer; font-size:medium; width:auto"
+                                            matTooltip="{{item.get('chosenOptions')['controls'][i2].value.unit.abbreviation}}">
+                                            info
+                                        </mat-icon>
+                                    </ng-container>
 
-                                    <ng-template #noSingle>
-                                        <select [formControl]="item.get('chosenOptions')['controls'][i2]">
-                                            <option [ngValue]="item.get('chosenOptions')['controls'][i2].value">
-                                                {{item.get('chosenOptions')['controls'][i2].value.description |
-                                                titlecase}}
-                                                ({{item.get('chosenOptions')['controls'][i2].value.unit.abbreviation}})
+                                </ng-container>
+
+
+                                <ng-template #noSingle>
+                                    <select [formControl]="item.get('chosenOptions')['controls'][i2]">
+                                        <option [ngValue]="item.get('chosenOptions')['controls'][i2].value">
+                                            {{item.get('chosenOptions')['controls'][i2].value.description |
+                                            titlecase}}
+                                            ({{item.get('chosenOptions')['controls'][i2].value.unit.abbreviation}})
+                                        </option>
+                                        <ng-container *ngFor="let product of packageItems.productsOptions">
+                                            <option
+                                                *ngIf="item.get('chosenOptions')['controls'][i2].value.id != product.id"
+                                                [ngValue]="product">
+                                                {{product.description | titlecase}} ({{product.unit.abbreviation}})
                                             </option>
-                                            <ng-container *ngFor="let product of packageItems.productsOptions">
-                                                <option
-                                                    *ngIf="item.get('chosenOptions')['controls'][i2].value.id != product.id"
-                                                    [ngValue]="product">
-                                                    {{product.description | titlecase}} ({{product.unit.abbreviation}})
-                                                </option>
-                                            </ng-container>
+                                        </ng-container>
 
-                                        </select>
-                                    </ng-template>
-                                </li>
-                            </ul>
-                        </ng-container>
-
-
-
-                    </td>
-                    <!-- price -->
-                    <td class="w3-right-align table-sale__td table-sale__td--space">
-                        <span>{{giveProductPrice(item.value) | currency: 'S/. ':'symbol':'2.2-2'}}</span>
-                        <mat-icon *ngIf="sale.status == saleStatusOptions.attended" class="removeIcon" color="primary"
-                            (click)="onDeleteProduct(i)">
-                            remove_circle
-                        </mat-icon>
-                    </td>
+                                    </select>
+                                </ng-template>
+                            </li>
+                        </ul>
+                    </ng-container>
                 </div>
-
-            </tr>
-            <tr>
-                <td class="table-sale__td table-sale__td--border"></td>
-                <td class="w3-right-align table-sale__td table-sale__td--border">
-                    SubTotal
-                </td>
-                <td class="w3-right-align table-sale__td table-sale__td--border table-sale__td--space"
-                    style="padding-right:32px">
-                    <span>{{getTotalPrice() -
-                        getTotalPrice()/1.18*0.18 | currency:'S/. ':'symbol':'2.2-2'}}
-                    </span>
-                </td>
-
-            </tr>
-            <tr>
-                <td class="table-sale__td"></td>
-                <td class="w3-right-align table-sale__td">
-                    I.G.V
-                </td>
-                <td class="w3-right-align table-sale__td table-sale__td--space" style="padding-right:32px">
-                    <span>
-                        {{getTotalPrice()/1.18*0.18 | currency:'S/. ':'symbol':'2.2-2'}}
-                    </span>
-                </td>
-
-            </tr>
-            <tr>
-                <td class="table-sale__td"></td>
-                <td class="w3-right-align table-sale__td">
-                    Total
-                </td>
-                <td class="w3-right-align table-sale__td table-sale__td--space" style="padding-right:32px">
-                    <span>
-                        {{getTotalPrice() | currency:'S/. ':'symbol':'2.2-2'}}
-                    </span>
-                </td>
-
-            </tr>
-            <tr>
-                <td class="table-sale__td table-sale__td--border"></td>
-                <td class="w3-right-align table-sale__td table-sale__td--border">
-                    Delivery
-                </td>
-                <td class="w3-right-align table-sale__td table-sale__td--border table-sale__td--space"
-                    style="padding-right:32px">
-                    S/. <input *ngIf="sale.status == saleStatusOptions.attended else readDelivery" autocomplete="off"
-                        class="table-sale__input--width" formControlName="deliveryPrice" type="number" required min=0>
-                    <ng-template #readDelivery>
-                        {{this.productForm.get('deliveryPrice').value |number:'2.2-2'}}
-                    </ng-template>
-                </td>
-            </tr>
-            <tr>
+                <div class="details__row--price">
+                    <span>{{giveProductPrice(item.value) | currency: 'S/. ':'symbol':'2.2-2'}}</span>
+                    <mat-icon *ngIf="sale.status == saleStatusOptions.attended" class="removeIcon" color="primary"
+                        (click)="onDeleteProduct(i)">
+                        remove_circle
+                    </mat-icon>
+                </div>
+            </div>
+        </div>
+        <div class="details__row details__row--yellow">
+            <div class="details__row--quantity details__header"></div>
+            <div class="details__row--description details__header">SubTotal</div>
+            <div class="details__row--price details__header"><span>{{getTotalPrice() -
+                    getTotalPrice()/1.18*0.18 | currency:'S/. ':'symbol':'2.2-2'}}
+                </span></div>
+        </div>
+        <div class="details__row">
+            <div class="details__row--quantity details__header"></div>
+            <div class="details__row--description details__header">I.G.V.</div>
+            <div class="details__row--price details__header"><span>
+                    {{getTotalPrice()/1.18*0.18 | currency:'S/. ':'symbol':'2.2-2'}}
+                </span></div>
+        </div>
+        <div class="details__row">
+            <div class="details__row--quantity details__header"></div>
+            <div class="details__row--description details__header">Total</div>
+            <div class="details__row--price details__header"><span>
+                    {{getTotalPrice() | currency:'S/. ':'symbol':'2.2-2'}}
+                </span></div>
+        </div>
+        <div class="details__row details__row--green">
+            <div class="details__row--quantity details__header"></div>
+            <div class="details__row--description details__header">Delivery</div>
+            <div class="details__row--price details__header">
+                S/. <input *ngIf="sale.status == saleStatusOptions.attended else readDelivery" autocomplete="off"
+                    class="table-sale__input--width" formControlName="deliveryPrice" type="number" required min=0>
+                <ng-template #readDelivery>
+                    {{this.productForm.get('deliveryPrice').value |number:'2.2-2'}}
+                </ng-template>
+            </div>
+        </div>
+        <div class="details__row">
+            <div class="details__row--quantity details__header"></div>
+            <div class="details__row--description details__header">
                 <input matInput class="w3-small" formControlName="deliveryDistrict" type="text" readonly>
-            </tr>
-        </table>
+            </div>
+            <div class="details__row--price details__header"></div>
+        </div>
     </div>
+
     <div class="total-div">
         <div class="bigCheckbox">
             <mat-checkbox [disabled]="(loading$ | async) || !(user.confi || user.accountant)"
