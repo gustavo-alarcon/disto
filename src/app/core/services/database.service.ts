@@ -32,7 +32,7 @@ import { AuthService } from "./auth.service";
   providedIn: "root",
 })
 export class DatabaseService {
-  public version: string = "V1.1.69r";
+  public version: string = "V1.1.70r";
   public isOpen: boolean = false;
   public isAdmin: boolean = false;
   public messageSaw: number = 0;

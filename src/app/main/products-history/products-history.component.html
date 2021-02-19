@@ -62,7 +62,7 @@
                                     <mat-icon>close</mat-icon>
                                 </button>
                             </div>
-                            <app-shopping-cart [delivery]="chooseSale.deliveryPrice" [change]="false"
+                            <app-shopping-cart [delivery]="chooseSale.location.district.delivery" [change]="false"
                                 [order]="chooseSale.requestedProducts" [modified]="false">
                             </app-shopping-cart>
 
@@ -95,7 +95,7 @@
                                             <mat-icon *ngIf="sale.voucherChecked">done</mat-icon>
                                         </div>
                                     </div>
-                                    <div class="total">S/. {{(sale.total + sale.deliveryPrice) | number: '.2'}}</div>
+                                    <div class="total">S/. {{(sale.total + sale.location.district.delivery) | number: '.2'}}</div>
                                 </div>
                             </div>
                         </mat-card>
