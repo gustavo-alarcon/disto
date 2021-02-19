@@ -121,7 +121,8 @@
                                     <ng-template #noSingle>
                                         <select [formControl]="item.get('chosenOptions')['controls'][i2]">
                                             <option [ngValue]="item.get('chosenOptions')['controls'][i2].value">
-                                                {{item.get('chosenOptions')['controls'][i2].value.description | titlecase}}
+                                                {{item.get('chosenOptions')['controls'][i2].value.description |
+                                                titlecase}}
                                                 ({{item.get('chosenOptions')['controls'][i2].value.unit.abbreviation}})
                                             </option>
                                             <ng-container *ngFor="let product of packageItems.productsOptions">
@@ -202,6 +203,9 @@
                         {{this.productForm.get('deliveryPrice').value |number:'2.2-2'}}
                     </ng-template>
                 </td>
+            </tr>
+            <tr>
+                <input matInput class="w3-small" formControlName="deliveryDistrict" type="text" readonly>
             </tr>
         </table>
     </div>
