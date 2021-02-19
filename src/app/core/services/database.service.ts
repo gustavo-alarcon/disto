@@ -1,8 +1,7 @@
-import { Sale, saleStatusOptions } from "./../models/sale.model";
+import { Sale } from "./../models/sale.model";
 import { Injectable } from "@angular/core";
 import {
   AngularFirestore,
-  AngularFirestoreCollection,
   DocumentReference,
   AngularFirestoreDocument,
 } from "@angular/fire/firestore";
@@ -14,7 +13,6 @@ import {
   switchMap,
   take,
   mapTo,
-  tap,
 } from "rxjs/operators";
 import { GeneralConfig } from "../models/generalConfig.model";
 import { Observable, concat, of, interval, BehaviorSubject, from } from "rxjs";
@@ -26,13 +24,12 @@ import { Buy, BuyRequestedProduct } from "../models/buy.model";
 import * as firebase from "firebase";
 import { Package } from "../models/package.model";
 import { AngularFireAuth } from "@angular/fire/auth";
-import { AuthService } from "./auth.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class DatabaseService {
-  public version: string = "V1.1.70r";
+  public version: string = "V1.1.71r";
   public isOpen: boolean = false;
   public isAdmin: boolean = false;
   public messageSaw: number = 0;
