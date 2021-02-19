@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 
 @NgModule({
@@ -15,6 +16,7 @@ import { MatInputModule } from '@angular/material/input';
     MatIconModule,
     MatButtonModule,
     MatInputModule,
+    MatProgressBarModule
   ],
   exports: [
     ShoppingCartComponent

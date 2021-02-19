@@ -17,6 +17,7 @@ import { PurchaseComponent } from '../purchase/purchase.component';
 export class ShoppingCartViewComponent implements OnInit {
 
   loadCart$: Observable<any>
+  orderBlocked: boolean = false;
 
   constructor(
     public dbs: DatabaseService,
@@ -43,6 +44,10 @@ export class ShoppingCartViewComponent implements OnInit {
         this.dbs.sum.next(this.dbs.total);
       }
     }
+  }
+
+  isBlocked(event): void {
+    this.orderBlocked = event;
   }
 
   back(route) {
