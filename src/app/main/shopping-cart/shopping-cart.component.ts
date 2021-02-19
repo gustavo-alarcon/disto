@@ -1,10 +1,12 @@
 import { Product } from 'src/app/core/models/product.model';
 import { Unit } from 'src/app/core/models/unit.model';
 import { DatabaseService } from 'src/app/core/services/database.service';
-import { Observable, combineLatest, of } from 'rxjs';
-import { Component, OnInit, Input } from '@angular/core';
-import { map, tap, switchMap } from 'rxjs/operators';
+import { Observable, of, BehaviorSubject, combineLatest } from 'rxjs';
+import { Component, OnInit, Input, Output } from '@angular/core';
+import { catchError, distinctUntilChanged, map, switchMap, take, tap } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { EventEmitter } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-shopping-cart',
@@ -20,71 +22,98 @@ export class ShoppingCartComponent implements OnInit {
   }[] = []
   @Input() modified: boolean
   @Input() change: boolean
+  @Output() outOfStock = new EventEmitter();
 
   delivery$: Observable<number>
   order$: Observable<any>
-  total: number = 0
+  total: number = 0;
+
+  checkingOrder = new BehaviorSubject<boolean>(false);
+  checkingOrder$ = this.checkingOrder.asObservable();
+
+  checkAvailabilityAgain = new BehaviorSubject<boolean>(false);
+  checkAvailabilityAgain$ = this.checkAvailabilityAgain.asObservable();
+
+  orderBlocked: boolean = false;
+  availability$: Observable<boolean[]>;
 
   constructor(
     private snackbar: MatSnackBar,
-    public dbs: DatabaseService
+    public dbs: DatabaseService,
+    public router: Router
   ) { }
 
   ngOnInit(): void {
-    
-    /*if(this.change){
-      
-      this.order$ = combineLatest(
-        this.dbs.changeStock$,
-        this.dbs.orderObs$
-      ).pipe(
-        map(([products,ord])=>{
-          
-          
-          return [...ord].map(o=>{
-            let pro = products.filter(el=>this.inProduct(el,o))[0]
-            
-            if(pro){
-              o["change"]=this.inOrder([...ord],o['product'],pro.stock)
-               
-            }
-            return o
-            
-          })
-            
-        }),
-        tap(res=>{
-          
-          this.total = res.map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0)
-          
+    this.availability$ = combineLatest(
+      this.checkAvailabilityAgain$
+    ).pipe(
+      switchMap((action) => {
+        return this.checkAvailability()
+      })
+    );
+
+    this.order$ = of(this.order)
+    this.total = this.order.map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0);
+  }
+
+  checkAvailability(): Observable<Array<boolean>> {
+    this.checkingOrder.next(true);
+    let promiseArray: Observable<boolean>[] = [];
+    console.log('order lenght: ', this.order.length);
+
+    if (!this.order.length) { this.router.navigateByUrl('/main') };
+    this.order.forEach((item, index) => {
+      promiseArray.push(
+        this.dbs.getProduct(item.product.id)
+          .pipe(
+            map(product => {
+              if (product.realStock < item.quantity || product.realStock < product.sellMinimum || !product.published) {
+                this.order[index]['outOfStock'] = true;
+              } else {
+                this.order[index]['outOfStock'] = false;
+              }
+              return this.order[index]['outOfStock'];
+            })
+          )
+      )
+    })
+
+    return combineLatest(promiseArray)
+      .pipe(
+        distinctUntilChanged(),
+        tap(resultList => {
+          console.log(resultList);
+
+          this.orderBlocked = false;
+          if (resultList) {
+            resultList.every(result => {
+              this.outOfStock.emit(result);
+              this.orderBlocked = result;
+              return !result;
+            })
+          }
+          console.log('checking');
+
+          this.checkingOrder.next(false);
         })
       )
-        
-    }else{
-      this.order$ = of(this.order)
-      
-    }*/
-    this.order$ = of(this.order)
-    this.total = this.order.map(el => this.giveProductPrice(el)).reduce((a, b) => a + b, 0)
-
   }
 
   inProduct(prod, ord) {
-    
     if (ord.product.package) {
       return ord.chosenOptions.filter((lo) => lo["id"] == prod["product"]["id"]);
-    }else{
+    } else {
       return ord["product"]["id"] == prod["product"]["id"]
     }
   }
 
-  inOrder(ord,prod,stock) {
+  inOrder(ord, prod, stock) {
     let quant = 0
     let index = ord.findIndex(
       (el) => el["product"]["id"] == prod["id"]
     );
     if (index != -1) {
-      quant+= ord[index]["quantity"];
+      quant += ord[index]["quantity"];
     }
     let inPackage = ord.filter((li) => {
       if (li.product.package) {
@@ -94,9 +123,9 @@ export class ShoppingCartComponent implements OnInit {
       }
     });
     if (inPackage.length) {
-      quant+= inPackage.length;
+      quant += inPackage.length;
     }
-    return quant>stock
+    return quant > stock
   }
 
   getUnit(quantity: number, unit: Unit) {
@@ -140,8 +169,9 @@ export class ShoppingCartComponent implements OnInit {
     localStorage.removeItem('dbsorder')
     localStorage.setItem('dbsorder', JSON.stringify(this.dbs.order));
     this.dbs.orderObs.next(this.order)
+    this.checkAvailabilityAgain.next(true);
     if (this.order.length == 0) {
-      
+
       this.dbs.total = this.total
       localStorage.removeItem('order')
       localStorage.removeItem('length')

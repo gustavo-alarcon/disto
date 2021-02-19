@@ -73,6 +73,7 @@ import { SalesVideoComponent } from './sales-video/sales-video.component';
     MatDatepickerModule,
     MatExpansionModule,
     MatNativeDateModule,
+    MatProgressBarModule,
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyA2tVXwzAQc5Ppj8-oTEuYBCFyJp39Hz7s'
     }),

@@ -7,10 +7,10 @@
     </div>
     <div *ngIf="order$ | async as ord">
       <div *ngFor="let item of ord; let ind = index" [style.color]="item['change'] ? 'red' : 'black'">
-        <div style="display: flex; flex-wrap: wrap; align-items: center">
+        <div style="display: flex; flex-wrap: wrap; align-items: center" [ngClass]="{'out-of-stock': item.outOfStock}">
           <div style="width: 25%">
             {{ item["quantity"] | number: "2.0" }}
-            {{ getUnit(item.quantity, item.product.unit) }}
+            ({{ getUnit(item.quantity, item.product.unit) }})
           </div>
           <div style="width: 45%">
             {{ item["product"]["description"] | titlecase }}
@@ -29,44 +29,35 @@
           <div class="ms-flex ms-flex--center">
             <div style="width: 25%"></div>
             <div style="width: 45%">
-              <div
-                *ngFor="let prod of item['chosenOptions']"
-                style="font-size: 0.8em"
-              >
+              <div *ngFor="let prod of item['chosenOptions']" style="font-size: 0.8em">
                 1 {{ getUnit(1, prod.unit) }}
                 {{ prod["description"] | titlecase }}
               </div>
             </div>
           </div>
         </div>
-        <div
-          *ngIf="
+        <div *ngIf="
             item['product']['promo'] &&
             item['quantity'] >= item['product']['promoData']['quantity']
-          "
-          style="margin-top: -4px"
-        >
-          <div
-            class="ms-flex ms-flex--center"
-            *ngIf="item.product.promoData.quantity > 1"
-          >
+          " style="margin-top: -4px">
+          <div class="ms-flex ms-flex--center" *ngIf="item.product.promoData.quantity > 1">
             <div style="width: 25%"></div>
             <div style="width: 45%">
               <mat-hint style="font-size: 0.8em">
                 {{
-                  round(
-                    item["quantity"] / item["product"]["promoData"]["quantity"]
-                  )
+                round(
+                item["quantity"] / item["product"]["promoData"]["quantity"]
+                )
                 }}
                 ({{ item["product"]["promoData"]["quantity"] }}
                 {{
-                  getUnit(
-                    item["product"]["promoData"]["quantity"],
-                    item.product.unit
-                  )
+                getUnit(
+                item["product"]["promoData"]["quantity"],
+                item.product.unit
+                )
                 }}
                 x S/.{{
-                  item["product"]["promoData"]["promoPrice"] | number: ".2"
+                item["product"]["promoData"]["promoPrice"] | number: ".2"
                 }}
                 )
               </mat-hint>
@@ -92,19 +83,26 @@
       </div>
     </div>
   </div>
+  <mat-progress-bar mode="indeterminate" *ngIf="checkingOrder$ | async"></mat-progress-bar>
   <div style="display: flex; flex-direction: row-reverse; margin-top: 20px">
     <div *ngIf="modified" class="ticket__total">
-      S/. {{(total  | number: ".2")}}
+      S/. {{(total | number: ".2")}}
     </div>
     <div *ngIf="!modified" class="ticket__total">
       S/. {{(total + delivery | number: ".2")}}
     </div>
   </div>
 
-  <div class="mensaje" *ngIf="modified">
+  <div class="mensaje" *ngIf="modified && (availability$ | async)">
     <p>
       💚 Hola Cheese lover, al finalizar tu compra, te saldrá el precio total a
       pagar, incluido delivery, según tu distrito.
     </p>
+  </div>
+  <div class="out-of-stock-message" *ngIf="orderBlocked">
+    <p>
+      🚨 Parece que algunos items en tu carrito de compra, no tienen stock suficiente.
+    </p>
+    <p>😳 Por favor, verifica tu carrito de compras para continuar con la compra.</p>
   </div>
 </div>
