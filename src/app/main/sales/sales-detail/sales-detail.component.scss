@@ -7,6 +7,47 @@
   padding: 16px 21px;
 }
 
+
+
+.details__row {
+  display: flex;
+  align-items: stretch;
+  font-size: 0.9rem;
+
+  .details__header {
+    font-weight: 500;
+    font-size: 1rem;
+  }
+
+  &--bottom {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+  }
+
+  &--yellow {
+    border-top: 3px solid #fcd652;
+  }
+
+  &--green {
+    border-top: 3px solid #5da92f;
+  }
+
+  &--quantity {
+    width: 30%;
+    align-self: center;
+  }
+
+  &--description {
+    width: 40%;
+  }
+
+  &--price {
+    width: 30%;
+    text-align: right;
+    align-self: center;
+  }
+
+}
+
 table {
   font-weight: bold;
   opacity: 0.8;

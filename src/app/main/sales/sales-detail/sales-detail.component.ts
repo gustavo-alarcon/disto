@@ -135,8 +135,6 @@ export class SalesDetailComponent implements OnInit {
       this.dbs.getGeneralConfigDoc()).pipe(
         map(([formValue, productsList, generalConfig]) => {
 
-          //console.log(formValue);
-
           let products = !productsList.length ? [] :
             productsList.filter(el => !this.productForm.get('productList').value.find(
               (product: SaleRequestedProducts) => product.product.id == el.id
