@@ -4,14 +4,13 @@ import { Observable, BehaviorSubject, merge, combineLatest, iif, of, throwError,
 import { Sale, SaleRequestedProducts, saleStatusOptions } from 'src/app/core/models/sale.model';
 import { DatabaseService } from 'src/app/core/services/database.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { startWith, map, tap, take, switchMap, debounceTime, pairwise, filter } from 'rxjs/operators';
+import { startWith, map, take, switchMap, pairwise, filter } from 'rxjs/operators';
 import { Product } from 'src/app/core/models/product.model';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { User } from 'src/app/core/models/user.model';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
 import { SalesPhotoDialogComponent } from '../sales-photo-dialog/sales-photo-dialog.component';
-import { GeneralConfig } from 'src/app/core/models/generalConfig.model';
 import { Package } from 'src/app/core/models/package.model';
 
 @Component({
@@ -60,7 +59,8 @@ export class SalesDetailComponent implements OnInit {
     this.searchProductControl = new FormControl("")
 
     this.productForm = this.fb.group({
-      deliveryPrice: [this.sale.deliveryPrice, Validators.required],
+      deliveryPrice: [this.sale.location ? this.sale.location.district.delivery : null, Validators.required],
+      deliveryDistrict: [this.sale.location ? this.sale.location.district.name : null, Validators.required],
       productList: this.fb.array([])
     });
 
