@@ -116,7 +116,7 @@
 
 
                                 <ng-template #noSingle>
-                                    <select [formControl]="item.get('chosenOptions')['controls'][i2]">
+                                    <select [formControl]="item.get('chosenOptions')['controls'][i2]" style="width: 116px">
                                         <option [ngValue]="item.get('chosenOptions')['controls'][i2].value">
                                             {{item.get('chosenOptions')['controls'][i2].value.description |
                                             titlecase}}
