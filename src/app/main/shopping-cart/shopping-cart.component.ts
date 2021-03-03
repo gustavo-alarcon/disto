@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
 })
 export class ShoppingCartComponent implements OnInit {
 
-  @Input() delivery: number = 6
+  @Input() delivery: number = 8
   @Input() order: {
     product: Product,
     quantity: number

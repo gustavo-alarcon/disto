@@ -34,6 +34,39 @@ export class AuthService {
     private dbs: DatabaseService
   ) {
 
+    // FUNCTION USED FOR USER'S CONTACT UPDATE TO NULL
+    // this.afs.collection<User>('users').valueChanges().subscribe(users => {
+
+    //   let batchCount = Math.ceil(users.length / 500);
+    //   let batchArray = [];
+
+    //   for (let index = 0; index < batchCount; index++) {
+    //     // create batch
+    //     const batch = this.afs.firestore.batch();
+    //     let limit = 500 * (index + 1) > users.length ? users.length : 500 * (index + 1);
+
+    //     for (let j = 500 * index; j < limit; j++) {
+    //       let userRef = this.afs.firestore.doc(`users/${users[j].uid}`);
+    //       batch.update(userRef, { contact: null })
+    //     };
+
+    //     batchArray.push(batch)
+    //   }
+
+    //   batchArray.forEach(batch => {
+    //     batch.commit().then(() => {
+    //       console.log('users updated');
+
+    //     })
+    //       .catch(err => {
+    //         console.log(err);
+
+    //       })
+    //   })
+
+    // });
+
+
     this.afAuth.setPersistence('local');
 
     // observe user authentication
@@ -71,9 +104,9 @@ export class AuthService {
   public signIn(type: 'facebook' | 'google'): Promise<void | firebase.auth.UserCredential> {
     let provider = null;
     console.log('Hola Google');
-        
+
     this.dbs.expressCustomer = false;
-    
+
     switch (type) {
       case 'facebook':
         provider = facebookProvider;
